@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toglogg</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="wrap" id="authScreen" style="display:none;">
+  <div class="auth-box">
+    <p class="board-label">Toglogg</p>
+    <h1 class="auth-h1">Din reisedagbok for lok og motorvogner</h1>
+    <p class="sub">Logg inn for å se samlingen din, eller opprett en bruker hvis du er ny.</p>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-mode="login">Logg inn</button>
+      <button class="auth-tab" data-mode="register">Opprett bruker</button>
+    </div>
+
+    <form id="authForm">
+      <label for="usernameInput">Brukernavn</label>
+      <input type="text" id="usernameInput" autocomplete="username" placeholder="ditt-brukernavn">
+
+      <label for="passwordInput">Passord</label>
+      <input type="password" id="passwordInput" autocomplete="current-password" placeholder="Minst 6 tegn">
+
+      <div class="form-error" id="authError"></div>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn save" id="authSubmit">Logg inn</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="wrap" id="appScreen" style="display:none;">
+
+  <header class="hero">
+    <div class="hero-top">
+      <p class="board-label">Toglogg</p>
+      <button class="btn" id="logoutBtn">Logg ut (<span id="whoami"></span>)</button>
+    </div>
+    <h1>Hver reise du tar. Et helt liv på skinner.</h1>
+    <p class="sub">Bildene dine av lok og motorvogner, sortert etter kategori og type.</p>
+    <div class="hero-row">
+      <div class="stats">
+        <div class="stat"><span class="n" id="statTotal">0</span><span class="l">bilder</span></div>
+        <div class="stat"><span class="n" id="statLok">0</span><span class="l">lok</span></div>
+        <div class="stat"><span class="n" id="statMotorvogn">0</span><span class="l">motorvogner</span></div>
+      </div>
+      <button class="primary" id="addBtn">Legg til bilde</button>
+    </div>
+  </header>
+
+  <div class="filters">
+    <button class="tab active" data-kat="alle">Alle</button>
+    <button class="tab" data-kat="Lok">Lok</button>
+    <button class="tab" data-kat="Motorvogn">Motorvogn</button>
+    <select id="typeFilter">
+      <option value="alle">Alle typer</option>
+    </select>
+  </div>
+
+  <div id="gridArea"></div>
+</div>
+
+<div class="overlay" id="addOverlay">
+  <div class="modal">
+    <button class="close-x" id="closeAdd" aria-label="Lukk">×</button>
+    <h2>Legg til bilde</h2>
+    <form id="addForm">
+      <label for="fileInput">Bilde</label>
+      <input type="file" id="fileInput" accept="image/*">
+      <img class="preview" id="previewImg" alt="">
+      <div class="form-error" id="fileError">Velg et bilde først.</div>
+
+      <label>Kategori</label>
+      <div class="cat-choice">
+        <button type="button" class="cat-btn lok" data-kat="Lok">Lok</button>
+        <button type="button" class="cat-btn motorvogn" data-kat="Motorvogn">Motorvogn</button>
+      </div>
+
+      <label for="typeInput">Type</label>
+      <input type="text" id="typeInput" list="typeSuggestions" placeholder="F.eks. El 18">
+      <datalist id="typeSuggestions"></datalist>
+
+      <label for="kodeInput">Kode (lok- eller vognnummer)</label>
+      <input type="text" id="kodeInput" placeholder="F.eks. El 18 2245">
+
+      <label for="tittelInput">Tittel</label>
+      <input type="text" id="tittelInput" placeholder="F.eks. NSB El 18 ved Oslo S">
+      <div class="form-error" id="tittelError">Skriv inn en tittel.</div>
+
+      <label for="stedInput">Sted (valgfritt)</label>
+      <input type="text" id="stedInput" placeholder="F.eks. Oslo S">
+
+      <label for="datoInput">Dato (valgfritt)</label>
+      <input type="date" id="datoInput">
+
+      <label for="notatInput">Notat (valgfritt)</label>
+      <textarea id="notatInput" placeholder="Detaljer om bildet, vognnummer, osv."></textarea>
+
+      <div class="form-error" id="saveError"></div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn" id="cancelAdd">Avbryt</button>
+        <button type="submit" class="btn save" id="saveBtn">Lagre bilde</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="overlay" id="viewOverlay">
+  <div class="modal wide">
+    <button class="close-x" id="closeView" aria-label="Lukk">×</button>
+    <img class="view-img" id="viewImg" alt="">
+    <div class="view-info">
+      <span class="badge" id="viewBadge"></span>
+      <div class="view-title" id="viewTitle"></div>
+      <div class="view-meta" id="viewMeta"></div>
+      <div class="view-note" id="viewNote"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn danger" id="deleteBtn">Slett bilde</button>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
