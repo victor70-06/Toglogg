@@ -9,4 +9,4 @@ ADMIN_BRUKERE = "victor"
 [[d1_databases]]
 binding = "DB"
 database_name = "toglogg-db"
-database_id = "a21dd244-6fa3-4479-…"
+database_id = "a21dd244-6fa3-4479-b3ad-b3d911742349"
