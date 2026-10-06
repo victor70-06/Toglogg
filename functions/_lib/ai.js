@@ -23,13 +23,28 @@ function bareSiffer(s) {
 }
 
 async function kjorModell(env, input) {
+  const forsok = async (inp) => {
+    try {
+      return await env.AI.run(MODELL, inp);
+    } catch (err) {
+      // Første gang må Metas lisens godtas for kontoen.
+      if (/agree|licen[cs]e|5016/i.test(String(err && err.message))) {
+        await env.AI.run(MODELL, { prompt: "agree" });
+        return await env.AI.run(MODELL, inp);
+      }
+      throw err;
+    }
+  };
   try {
-    return await env.AI.run(MODELL, input);
+    return await forsok(input);
   } catch (err) {
-    // Første gang må Metas lisens godtas for kontoen.
-    if (/agree|licen[cs]e/i.test(String(err && err.message))) {
-      await env.AI.run(MODELL, { prompt: "agree" });
-      return await env.AI.run(MODELL, input);
+    // Noen versjoner vil ha ren base64 uten "data:…;base64,"-prefiks
+    if (typeof input.image === "string" && input.image.startsWith("data:")) {
+      try {
+        return await forsok({ ...input, image: input.image.split(",")[1] });
+      } catch (err2) {
+        throw new Error(String((err2 && err2.message) || err2));
+      }
     }
     throw err;
   }
@@ -98,7 +113,8 @@ export async function aiIdentifiser(env, litenBilde, contentType) {
   const dataUrl = `data:${contentType || "image/jpeg"};base64,${tilBase64(new Uint8Array(litenBilde))}`;
   const prompt =
     "Dette er et bilde av et norsk tog. Finn enhetsnummeret som står malt på toget " +
-    "(på fronten eller siden). Norske motorvognsett har numre som \"72 06\", \"73-041\", \"BM 75 12\" eller \"7512\".\n" +
+    "(på fronten eller siden, ofte øverst ved frontruta). Norske motorvognsett har numre som " +
+    "\"69072\", \"72 06\", \"73-041\", \"BM 75 12\" eller \"7512\". Les alle sifrene nøyaktig.\n" +
     "Svar KUN med JSON, uten annen tekst:\n" +
     '{"er_tog": true/false, "lest_nummer": "nummeret nøyaktig slik det står, eller null hvis du ikke kan lese det", ' +
     '"forklaring": "kort setning på norsk"}';

@@ -4,7 +4,7 @@ import { aiSjekk } from "../../../_lib/ai.js";
 
 // D1 tillater maks ca. 2 MB per verdi. Nettleseren komprimerer under grensen.
 const MAKS_BYTES = 1_900_000;
-const MAKS_LITEN = 400_000;
+const MAKS_LITEN = 600_000;
 const TILLATTE_TYPER = ["image/jpeg", "image/png", "image/webp"];
 
 // Henter bildet (?liten=1 gir miniatyr). Kun eieren og admin får se det.

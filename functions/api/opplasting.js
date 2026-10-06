@@ -4,7 +4,7 @@ import { aiIdentifiser } from "../_lib/ai.js";
 import { hentFlate, matchNummer } from "../_lib/flate.js";
 
 const MAKS_BYTES = 1_900_000;
-const MAKS_LITEN = 400_000;
+const MAKS_LITEN = 600_000;
 const TILLATTE_TYPER = ["image/jpeg", "image/png", "image/webp"];
 
 // Last opp ett bilde. AI finner type og nummer:
@@ -122,6 +122,6 @@ export async function onRequestPost({ request, env }) {
     resultat: treff ? "godkjent" : "ukjent",
     enhet: tilEnhet(ny),
     lest: ai ? ai.lest : null,
-    aiFeil: !!aiFeil,
+    aiFeil: aiFeil || null,
   });
 }

@@ -380,6 +380,7 @@ input[type="file"] {
 .resultat-tittel { font-weight: 700; font-size: 16px; color: var(--ink); }
 .resultat-under { font-size: 13.5px; color: var(--ink-soft); margin-top: 3px; line-height: 1.4; }
 .velger { margin-top: 10px; }
+.feil-knapp { margin-top: 10px; padding: 7px 14px; font-size: 13px; color: var(--avvist); border-color: var(--avvist); background: transparent; }
 .velger-rad { display: flex; flex-wrap: wrap; gap: 8px; }
 .velger-rad select { flex: 1; min-width: 120px; width: auto; }
 #viewVelger .velger { margin-top: 12px; }
@@ -790,7 +791,7 @@ input[type="file"] {
     boks.innerHTML =
       '<div class="velger-rad"><select class="v-type">' + typeValg + '</select>' +
       '<select class="v-kode" disabled><option value="">Velg nummer …</option></select>' +
-      '<button type="button" class="btn save v-send" disabled>Send til kontroll</button></div>' +
+      '<button type="button" class="btn save v-send" disabled>' + (enhet.status === 'godkjent' ? 'Rett og send til kontroll' : 'Send til kontroll') + '</button></div>' +
       '<div class="form-error v-feil"></div>';
     var selType = boks.querySelector('.v-type');
     var selKode = boks.querySelector('.v-kode');
@@ -799,7 +800,7 @@ input[type="file"] {
       var t = selType.value;
       selKode.innerHTML = '<option value="">Velg nummer …</option>' + (flate[t] || []).map(function (k) {
         var e = finnEnhet(t, k);
-        var tatt = e && e.status === 'godkjent';
+        var tatt = e && e.status === 'godkjent' && e.id !== enhet.id;
         return '<option value="' + esc(k) + '"' + (tatt ? ' disabled' : '') + (k === enhet.kode ? ' selected' : '') + '>' +
           esc(k) + (tatt ? ' (allerede sett)' : '') + '</option>';
       }).join('');
@@ -848,7 +849,7 @@ input[type="file"] {
     var under = rad.querySelector('.resultat-under');
     tittel.textContent = 'Laster opp og leser nummeret …';
     rad.classList.add('jobber');
-    return Promise.all([komprimerBilde(fil, 1600, 1800000), komprimerBilde(fil, 1024, 380000)])
+    return Promise.all([komprimerBilde(fil, 1600, 1800000), komprimerBilde(fil, 1280, 550000)])
       .then(function (b) {
         var fd = new FormData();
         fd.append('bilde', b[0], 'bilde.jpg');
@@ -868,6 +869,7 @@ input[type="file"] {
           rad.classList.add('ok');
           tittel.textContent = '✓ ' + d.enhet.type + ' · ' + d.enhet.kode;
           under.textContent = 'AI leste «' + d.lest + '». Krysset av som sett!';
+          leggTilFeilKnapp(rad, d.enhet);
         } else if (d.resultat === 'allerede') {
           rad.classList.add('info');
           tittel.textContent = d.enhet.type + ' · ' + d.enhet.kode;
@@ -875,7 +877,7 @@ input[type="file"] {
         } else {
           rad.classList.add('venter');
           tittel.textContent = 'Fant ikke nummeret';
-          under.textContent = d.aiFeil ? 'AI-kontrollen var ikke tilgjengelig. Velg type og nummer selv:'
+          under.textContent = d.aiFeil ? 'AI-kontrollen feilet (' + d.aiFeil + '). Velg type og nummer selv:'
             : (d.lest ? 'AI leste «' + d.lest + '», men det står ikke i listen. Velg selv:' : (d.enhet.aiNotat || 'Velg type og nummer selv:'));
           rad.querySelector('.resultat-tekst').appendChild(lagVelger(d.enhet, function (ny) {
             rad.classList.remove('venter'); rad.classList.add('info');
@@ -890,6 +892,27 @@ input[type="file"] {
         tittel.textContent = 'Feil';
         under.textContent = err.message;
       });
+  }
+
+  // «Dette er feil»: brukeren retter AI-svaret, og bildet går til manuell kontroll.
+  function leggTilFeilKnapp(rad, enhet) {
+    var tekst = rad.querySelector('.resultat-tekst');
+    var knapp = document.createElement('button');
+    knapp.type = 'button';
+    knapp.className = 'btn feil-knapp';
+    knapp.textContent = 'Dette er feil';
+    knapp.addEventListener('click', function () {
+      knapp.remove();
+      rad.classList.remove('ok'); rad.classList.add('venter');
+      rad.querySelector('.resultat-under').textContent = 'Velg riktig type og nummer:';
+      tekst.appendChild(lagVelger(enhet, function (ny) {
+        rad.classList.remove('venter'); rad.classList.add('info');
+        rad.querySelector('.resultat-tittel').textContent = ny.type + ' · ' + ny.kode;
+        rad.querySelector('.resultat-under').textContent = 'Rettet. Sendt til manuell kontroll.';
+        var v = rad.querySelector('.velger'); if (v) v.remove();
+      }));
+    });
+    tekst.appendChild(knapp);
   }
 
   function lukkResultat() { $('resultatOverlay').classList.remove('show'); oppdaterAlt(); }
@@ -922,6 +945,16 @@ input[type="file"] {
     v.innerHTML = '';
     if (e.status === 'ukjent' || e.status === 'avvist') {
       v.appendChild(lagVelger(e, function () { visEnhet(id); visMelding('Sendt til manuell kontroll.', 'venter'); }));
+    } else if (e.status === 'godkjent' && e.vurdertAvAi) {
+      var feilKnapp = document.createElement('button');
+      feilKnapp.type = 'button';
+      feilKnapp.className = 'btn feil-knapp';
+      feilKnapp.textContent = 'Dette er feil';
+      feilKnapp.addEventListener('click', function () {
+        v.innerHTML = '<div class="resultat-under">Velg riktig type og nummer:</div>';
+        v.appendChild(lagVelger(e, function () { visEnhet(id); visMelding('Rettet. Sendt til manuell kontroll.', 'venter'); }));
+      });
+      v.appendChild(feilKnapp);
     }
     $('viewOverlay').classList.add('show');
   }
