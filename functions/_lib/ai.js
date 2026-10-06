@@ -7,7 +7,9 @@
 //
 // Slås av ved å sette AI_GODKJENNING = "av" i wrangler.toml.
 
-const MODELL = "@cf/meta/llama-3.2-11b-vision-instruct";
+const LLAMA4 = "@cf/meta/llama-4-scout-17b-16e-instruct";
+const LLAMA32 = "@cf/meta/llama-3.2-11b-vision-instruct";
+const SYSTEM = "Du er en ekspert på norske tog som leser enhetsnumre på bilder. Du svarer alltid kun med JSON.";
 
 function tilBase64(bytes) {
   let s = "";
@@ -22,32 +24,74 @@ function bareSiffer(s) {
   return String(s || "").replace(/\D/g, "");
 }
 
-async function kjorModell(env, input) {
-  const forsok = async (inp) => {
+function svarTekst(svar) {
+  if (!svar) return "";
+  if (typeof svar === "string") return svar;
+  if (typeof svar.response === "string") return svar.response;
+  if (svar.response && typeof svar.response === "object") return JSON.stringify(svar.response);
+  const c = svar.choices && svar.choices[0] && svar.choices[0].message && svar.choices[0].message.content;
+  if (typeof c === "string") return c;
+  return JSON.stringify(svar);
+}
+
+// Prøver flere modeller/formater, siden Workers AI har endret API-et over tid.
+async function kjorModell(env, prompt, dataUrl) {
+  const meldinger = [
+    { role: "system", content: SYSTEM },
+    {
+      role: "user",
+      content: [
+        { type: "text", text: prompt },
+        { type: "image_url", image_url: { url: dataUrl } },
+      ],
+    },
+  ];
+  const forsok = [
+    { modell: LLAMA4, input: { messages: meldinger, max_tokens: 200, temperature: 0 } },
+    { modell: LLAMA32, input: { messages: meldinger, max_tokens: 200, temperature: 0 } },
+    {
+      modell: LLAMA32,
+      input: { messages: [{ role: "system", content: SYSTEM }, { role: "user", content: prompt }], image: dataUrl, max_tokens: 200, temperature: 0 },
+    },
+  ];
+  const feil = [];
+  for (const f of forsok) {
     try {
-      return await env.AI.run(MODELL, inp);
+      return svarTekst(await env.AI.run(f.modell, f.input));
     } catch (err) {
-      // Første gang må Metas lisens godtas for kontoen.
-      if (/agree|licen[cs]e|5016/i.test(String(err && err.message))) {
-        await env.AI.run(MODELL, { prompt: "agree" });
-        return await env.AI.run(MODELL, inp);
+      const msg = String((err && err.message) || err);
+      // Llama 3.2 krever at Metas lisens godtas én gang per konto.
+      if (f.modell === LLAMA32 && /agree|licen[cs]e|5016/i.test(msg)) {
+        try {
+          await env.AI.run(LLAMA32, { prompt: "agree" });
+          return svarTekst(await env.AI.run(f.modell, f.input));
+        } catch (err2) {
+          feil.push(String((err2 && err2.message) || err2));
+          continue;
+        }
       }
-      throw err;
+      feil.push(f.modell.split("/").pop() + ": " + msg);
     }
-  };
-  try {
-    return await forsok(input);
-  } catch (err) {
-    // Noen versjoner vil ha ren base64 uten "data:…;base64,"-prefiks
-    if (typeof input.image === "string" && input.image.startsWith("data:")) {
-      try {
-        return await forsok({ ...input, image: input.image.split(",")[1] });
-      } catch (err2) {
-        throw new Error(String((err2 && err2.message) || err2));
-      }
-    }
-    throw err;
   }
+  throw new Error(feil.join(" | "));
+}
+
+// Stemmer avlest nummer med koden? «69072», «69 72», «6972» → 69-72
+function samsvarer(lest, kode) {
+  const [serie, nr] = String(kode || "").split("-");
+  if (!serie || !nr) return false;
+  const re = /(?<!\d)(\d{2})\D{0,3}(\d{1,3})(?!\d)/g;
+  let m;
+  while ((m = re.exec(String(lest || "")))) {
+    if (m[1] === serie && parseInt(m[2], 10) === parseInt(nr, 10)) return true;
+  }
+  return false;
+}
+
+function lesJson(tekst) {
+  const m = String(tekst || "").match(/\{[\s\S]*\}/);
+  if (!m) return null;
+  try { return JSON.parse(m[0]); } catch { return null; }
 }
 
 export async function aiSjekk(env, enhet, litenBilde, contentType) {
@@ -65,23 +109,8 @@ export async function aiSjekk(env, enhet, litenBilde, contentType) {
     `{"er_tog": true/false, "lest_nummer": "nummeret du kan lese på toget, eller null", ` +
     `"samsvarer": "ja" | "nei" | "usikker", "forklaring": "kort setning på norsk"}`;
 
-  const svar = await kjorModell(env, {
-    messages: [{ role: "user", content: prompt }],
-    image: dataUrl,
-    max_tokens: 200,
-    temperature: 0,
-  });
-
-  const tekst = typeof svar === "string" ? svar : (svar && svar.response) || "";
-  const m = tekst.match(/\{[\s\S]*\}/);
-  if (!m) return { beslutning: "usikker", notat: "AI ga uklart svar." };
-
-  let r;
-  try {
-    r = JSON.parse(m[0]);
-  } catch {
-    return { beslutning: "usikker", notat: "AI ga uklart svar." };
-  }
+  const r = lesJson(await kjorModell(env, prompt, dataUrl));
+  if (!r) return { beslutning: "usikker", notat: "AI ga uklart svar." };
 
   const lest = r.lest_nummer ? String(r.lest_nummer) : "";
   const forklaring = String(r.forklaring || "").slice(0, 200);
@@ -90,9 +119,7 @@ export async function aiSjekk(env, enhet, litenBilde, contentType) {
     return { beslutning: "avvist", notat: `AI: ser ikke ut til å være et tog. ${forklaring}`.trim() };
   }
 
-  const kodeSiffer = bareSiffer(enhet.kode);
-  const lestSiffer = bareSiffer(lest);
-  if (kodeSiffer.length >= 3 && lestSiffer.includes(kodeSiffer)) {
+  if (samsvarer(lest, enhet.kode)) {
     return { beslutning: "godkjent", notat: `AI leste «${lest}» – stemmer med ${enhet.kode}.` };
   }
 
@@ -119,21 +146,8 @@ export async function aiIdentifiser(env, litenBilde, contentType) {
     '{"er_tog": true/false, "lest_nummer": "nummeret nøyaktig slik det står, eller null hvis du ikke kan lese det", ' +
     '"forklaring": "kort setning på norsk"}';
 
-  const svar = await kjorModell(env, {
-    messages: [{ role: "user", content: prompt }],
-    image: dataUrl,
-    max_tokens: 150,
-    temperature: 0,
-  });
-
-  const tekst = typeof svar === "string" ? svar : (svar && svar.response) || "";
-  const m = tekst.match(/\{[\s\S]*\}/);
-  if (!m) return { erTog: true, lest: null, forklaring: "AI ga uklart svar." };
-  try {
-    const r = JSON.parse(m[0]);
-    const lest = r.lest_nummer && String(r.lest_nummer).toLowerCase() !== "null" ? String(r.lest_nummer) : null;
-    return { erTog: r.er_tog !== false, lest, forklaring: String(r.forklaring || "").slice(0, 200) };
-  } catch {
-    return { erTog: true, lest: null, forklaring: "AI ga uklart svar." };
-  }
+  const r = lesJson(await kjorModell(env, prompt, dataUrl));
+  if (!r) return { erTog: true, lest: null, forklaring: "AI ga uklart svar." };
+  const lest = r.lest_nummer && String(r.lest_nummer).toLowerCase() !== "null" ? String(r.lest_nummer) : null;
+  return { erTog: r.er_tog !== false, lest, forklaring: String(r.forklaring || "").slice(0, 200) };
 }
