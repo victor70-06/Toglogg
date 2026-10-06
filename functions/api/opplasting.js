@@ -68,7 +68,7 @@ export async function onRequestPost({ request, env }) {
   if (aiFeil) aiNotat = "AI-feil: " + aiFeil;
   else if (!ai) aiNotat = null;
   else if (!ai.erTog) aiNotat = "AI: ser ikke ut til å være et tog. " + ai.forklaring;
-  else if (treff) aiNotat = `AI leste «${ai.lest}» → ${treff.type} ${treff.kode}.`;
+  else if (treff) aiNotat = `AI leste «${ai.lest}» → ${treff.type} ${treff.kode}${treff.vogn !== null && treff.vogn !== undefined ? ` (vogn ${treff.vogn})` : ""}.`;
   else if (ai.lest) aiNotat = `AI leste «${ai.lest}», men fant det ikke i listen.`;
   else aiNotat = "AI fant ikke nummeret. " + ai.forklaring;
   aiNotat = aiNotat ? aiNotat.trim() : null;

@@ -1,3 +1,5 @@
+import { tolkNummer } from "./flate.js";
+
 // Automatisk kontroll av bilder med Cloudflare Workers AI (gratisnivå).
 //
 // Regler (forsiktige med vilje):
@@ -76,16 +78,11 @@ async function kjorModell(env, prompt, dataUrl) {
   throw new Error(feil.join(" | "));
 }
 
-// Stemmer avlest nummer med koden? «69072», «69 72», «6972» → 69-72
+// Stemmer avlest nummer med koden? «72136», «72 36», «7236» → 72-36
 function samsvarer(lest, kode) {
   const [serie, nr] = String(kode || "").split("-");
   if (!serie || !nr) return false;
-  const re = /(?<!\d)(\d{2})\D{0,3}(\d{1,3})(?!\d)/g;
-  let m;
-  while ((m = re.exec(String(lest || "")))) {
-    if (m[1] === serie && parseInt(m[2], 10) === parseInt(nr, 10)) return true;
-  }
-  return false;
+  return tolkNummer(lest).some((k) => k.serie === serie && k.sett === parseInt(nr, 10));
 }
 
 function lesJson(tekst) {
@@ -140,8 +137,9 @@ export async function aiIdentifiser(env, litenBilde, contentType) {
   const dataUrl = `data:${contentType || "image/jpeg"};base64,${tilBase64(new Uint8Array(litenBilde))}`;
   const prompt =
     "Dette er et bilde av et norsk tog. Finn enhetsnummeret som står malt på toget " +
-    "(på fronten eller siden, ofte øverst ved frontruta). Norske motorvognsett har numre som " +
-    "\"69072\", \"72 06\", \"73-041\", \"BM 75 12\" eller \"7512\". Les alle sifrene nøyaktig.\n" +
+    "(på fronten eller siden, ofte øverst ved frontruta). Norske motorvognsett har ofte 5 siffer, " +
+    "f.eks. \"72136\" eller \"69072\" (type, vognnummer i settet, settnummer), men kan også stå som \"72 06\" eller \"BM 75 12\". " +
+    "Les alle sifrene nøyaktig og ta med alle sifrene du ser.\n" +
     "Svar KUN med JSON, uten annen tekst:\n" +
     '{"er_tog": true/false, "lest_nummer": "nummeret nøyaktig slik det står, eller null hvis du ikke kan lese det", ' +
     '"forklaring": "kort setning på norsk"}';
