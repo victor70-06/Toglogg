@@ -9,7 +9,7 @@ ADMIN_BRUKERE = "victor"
 [[d1_databases]]
 binding = "DB"
 database_name = "toglogg-db"
-database_id = "a1b2c3d4-1234-5678-9abc-def012345678"
+database_id = "a21dd244-6fa3-4479-b3ad-b3d911742349"
 
 [[r2_buckets]]
 binding = "BILDER"
