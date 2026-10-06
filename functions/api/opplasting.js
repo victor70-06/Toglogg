@@ -49,7 +49,7 @@ export async function onRequestPost({ request, env }) {
   }
 
   const flate = await hentFlate(env, request);
-  const treff = ai && ai.erTog && ai.lest ? matchNummer(flate, ai.lest) : null;
+  const treff = ai && ai.erTog && ai.lest ? matchNummer(flate, ai.lest, ai.type) : null;
 
   // 2. Har brukeren denne fra før?
   let eksisterende = null;
@@ -68,7 +68,7 @@ export async function onRequestPost({ request, env }) {
   if (aiFeil) aiNotat = "AI-feil: " + aiFeil;
   else if (!ai) aiNotat = null;
   else if (!ai.erTog) aiNotat = "AI: ser ikke ut til å være et tog. " + ai.forklaring;
-  else if (treff) aiNotat = `AI leste «${ai.lest}» → ${treff.type} ${treff.kode}${treff.vogn !== null && treff.vogn !== undefined ? ` (vogn ${treff.vogn})` : ""}.`;
+  else if (treff) aiNotat = `AI leste «${ai.type ? ai.type + " " : ""}${ai.lest}» → ${treff.type} ${treff.kode}${treff.vogn !== null && treff.vogn !== undefined ? ` (vogn ${treff.vogn})` : ""}.`;
   else if (ai.lest) aiNotat = `AI leste «${ai.lest}», men fant det ikke i listen.`;
   else aiNotat = "AI fant ikke nummeret. " + ai.forklaring;
   aiNotat = aiNotat ? aiNotat.trim() : null;

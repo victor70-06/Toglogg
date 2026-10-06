@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS enheter (
   bilde_key TEXT,              -- versjonsmerke for bildet (byttes ved ny opplasting)
   status TEXT NOT NULL DEFAULT 'uten_bilde',
   avvist_grunn TEXT,
+  ai_notat TEXT,                -- hva AI-kontrollen så
   vurdert_av INTEGER,
   vurdert_tid INTEGER,
   opprettet INTEGER NOT NULL,
@@ -46,6 +47,7 @@ CREATE TABLE IF NOT EXISTS bildedata (
   innhold BLOB NOT NULL,
   content_type TEXT NOT NULL,
   storrelse INTEGER NOT NULL,
+  liten BLOB,                  -- miniatyrbilde (brukes i lister og av AI)
   FOREIGN KEY (enhet_id) REFERENCES enheter(id)
 );
 

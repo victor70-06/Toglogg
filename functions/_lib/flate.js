@@ -49,14 +49,41 @@ export function tolkNummer(lest) {
   return kandidater;
 }
 
+function normType(t) {
+  return String(t || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
 // Finner hvilken enhet et avlest nummer tilhører. Bare entydige treff.
-export function matchNummer(flate, lest) {
+// typeHint (det AI tror typen er, f.eks. "El 18") brukes når flere passer.
+export function matchNummer(flate, lest, typeHint) {
   const treff = new Map();
+  const legg = (e, vogn) => treff.set(e.kode + "|" + e.type, { ...e, vogn: vogn ?? null });
+
+  // Motorvognsett: TT-NN / TT C NN
   for (const k of tolkNummer(lest)) {
     for (const e of flate) {
-      const [a, b] = String(e.kode).split("-");
-      if (a === k.serie && parseInt(b, 10) === k.sett) treff.set(e.kode + "|" + e.type, { ...e, vogn: k.vogn });
+      if (!/^\d{2}-\d{2}$/.test(e.kode)) continue;
+      const [a, b] = e.kode.split("-");
+      if (a === k.serie && parseInt(b, 10) === k.sett) legg(e, k.vogn);
     }
   }
-  return treff.size === 1 ? [...treff.values()][0] : null;
+
+  // Lok: hele nummeret, f.eks. "2245", "651", "312.001", "214 022"
+  const grupper = String(lest || "").match(/\d[\d .]*\d|\d/g) || [];
+  const sifferGrupper = [...grupper.map((g) => g.replace(/\D/g, "")), ...(String(lest || "").match(/\d+/g) || [])];
+  const alleSiffer = String(lest || "").replace(/\D/g, "");
+  for (const e of flate) {
+    if (/^\d{2}-\d{2}$/.test(e.kode)) continue;
+    const s = String(e.kode).replace(/\D/g, "");
+    if (s.length < 3) continue;
+    if (sifferGrupper.includes(s) || alleSiffer === s || (s.length >= 4 && sifferGrupper.some((g) => g.endsWith(s)))) legg(e);
+  }
+
+  let liste = [...treff.values()];
+  if (liste.length > 1 && typeHint) {
+    const h = normType(typeHint);
+    const passer = liste.filter((e) => normType(e.type) === h || h.includes(normType(e.type)) || normType(e.type).includes(h));
+    if (passer.length) liste = passer;
+  }
+  return liste.length === 1 ? liste[0] : null;
 }

@@ -78,11 +78,17 @@ async function kjorModell(env, prompt, dataUrl) {
   throw new Error(feil.join(" | "));
 }
 
-// Stemmer avlest nummer med koden? «72136», «72 36», «7236» → 72-36
+// Stemmer avlest nummer med koden? Motorvogn: «72136» → 72-36. Lok: «El 18 2245» → 2245.
 function samsvarer(lest, kode) {
-  const [serie, nr] = String(kode || "").split("-");
-  if (!serie || !nr) return false;
-  return tolkNummer(lest).some((k) => k.serie === serie && k.sett === parseInt(nr, 10));
+  const k = String(kode || "");
+  if (/^\d{2}-\d{2}$/.test(k)) {
+    const [serie, nr] = k.split("-");
+    return tolkNummer(lest).some((t) => t.serie === serie && t.sett === parseInt(nr, 10));
+  }
+  const s = k.replace(/\D/g, "");
+  if (s.length < 3) return false;
+  const grupper = [...(String(lest || "").match(/\d[\d .]*\d|\d/g) || []).map((g) => g.replace(/\D/g, "")), ...(String(lest || "").match(/\d+/g) || [])];
+  return grupper.includes(s) || String(lest || "").replace(/\D/g, "") === s;
 }
 
 function lesJson(tekst) {
@@ -136,16 +142,18 @@ export async function aiIdentifiser(env, litenBilde, contentType) {
 
   const dataUrl = `data:${contentType || "image/jpeg"};base64,${tilBase64(new Uint8Array(litenBilde))}`;
   const prompt =
-    "Dette er et bilde av et norsk tog. Finn enhetsnummeret som står malt på toget " +
-    "(på fronten eller siden, ofte øverst ved frontruta). Norske motorvognsett har ofte 5 siffer, " +
-    "f.eks. \"72136\" eller \"69072\" (type, vognnummer i settet, settnummer), men kan også stå som \"72 06\" eller \"BM 75 12\". " +
-    "Les alle sifrene nøyaktig og ta med alle sifrene du ser.\n" +
+    "Dette er et bilde av et tog i Norge (motorvognsett eller lokomotiv). Finn typen og enhetsnummeret som står " +
+    "malt på toget (på fronten eller siden, ofte ved frontruta).\n" +
+    "Motorvognsett har ofte 5 siffer, f.eks. \"72136\" eller \"69072\" (type, vognnummer, settnummer), " +
+    "eller \"72 06\". Lok har typenavn og nummer, f.eks. \"El 18 2245\", \"Di 4 651\", \"CD 312.001\", " +
+    "\"Iore 112\", \"159 001\" (EuroDual) eller \"214 022\". Les alle sifrene nøyaktig.\n" +
     "Svar KUN med JSON, uten annen tekst:\n" +
-    '{"er_tog": true/false, "lest_nummer": "nummeret nøyaktig slik det står, eller null hvis du ikke kan lese det", ' +
-    '"forklaring": "kort setning på norsk"}';
+    '{"er_tog": true/false, "type": "typen hvis du ser den (f.eks. El 18 eller BM 72), ellers null", ' +
+    '"lest_nummer": "nummeret nøyaktig slik det står, eller null", "forklaring": "kort setning på norsk"}';
 
   const r = lesJson(await kjorModell(env, prompt, dataUrl));
   if (!r) return { erTog: true, lest: null, forklaring: "AI ga uklart svar." };
   const lest = r.lest_nummer && String(r.lest_nummer).toLowerCase() !== "null" ? String(r.lest_nummer) : null;
-  return { erTog: r.er_tog !== false, lest, forklaring: String(r.forklaring || "").slice(0, 200) };
+  const type = r.type && String(r.type).toLowerCase() !== "null" ? String(r.type) : null;
+  return { erTog: r.er_tog !== false, lest, type, forklaring: String(r.forklaring || "").slice(0, 200) };
 }

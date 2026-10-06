@@ -314,7 +314,7 @@ input[type="file"] {
 .type-chip-bar { width: 100%; height: 4px; margin-top: 4px; }
 .type-seksjon.lok .type-chip-bar i { background: var(--lok); }
 .hjelp { font-size: 13px; color: var(--ink-soft); margin-top: 8px; }
-.enhet-rutenett { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; margin-bottom: 10px; }
+.enhet-rutenett { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; margin-bottom: 10px; }
 .enhet-rute {
   font-family: var(--font-body); font-weight: 600; font-size: 14px; padding: 12px 4px; border-radius: 8px;
   cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--ink-soft);
@@ -360,6 +360,7 @@ input[type="file"] {
 }
 .last-opp-knapp:hover { background: #3f7bdc; }
 .last-opp-knapp:active { transform: scale(0.97); }
+.type-seksjon-tittel small { font-size: 14px; font-weight: 500; color: var(--ink-soft); margin-left: 8px; }
 .type-chips.store { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
 .type-chips.store .type-chip { padding: 16px; }
 .type-chips.store .type-chip-navn { font-size: 18px; }
@@ -433,7 +434,8 @@ input[type="file"] {
   </header>
 
   <div class="view-switch">
-    <button class="view-btn active" data-view="typer">Togtyper</button>
+    <button class="view-btn active" data-view="motorvogn">Motorvognsett</button>
+    <button class="view-btn" data-view="lok" id="lokTab">Lok</button>
     <button class="view-btn" data-view="bilder">Mine bilder</button>
     <button class="view-btn" data-view="admin" id="adminTab" style="display:none;">Godkjenning <span class="tab-teller" id="adminTeller"></span></button>
   </div>
@@ -500,7 +502,10 @@ input[type="file"] {
   var enheter = [];
   var flate = {};          // { "BM 72": ["72-01", ...], ... }
   var typeRekkefolge = [];
-  var aktivVisning = 'typer';
+  var typeKat = {};        // { "BM 72": "Motorvogn", "EL18": "Lok" }
+  var aktivVisning = 'motorvogn';
+  function erTypeVisning() { return aktivVisning === 'motorvogn' || aktivVisning === 'lok'; }
+  function aktivKat() { return aktivVisning === 'lok' ? 'Lok' : 'Motorvogn'; }
   var apenType = null;
   var aktivStatus = 'alle';
   var valgtId = null;
@@ -567,19 +572,19 @@ input[type="file"] {
   // ---------- Flåteliste ----------
 
   function lastInnFlate() {
-    function hent(fil) {
+    function hent(fil, kat) {
       return fetch('/flate/' + fil, { cache: 'no-cache' })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (d) {
           if (!d || !d.typer) return;
           Object.keys(d.typer).forEach(function (t) {
-            if (d.typer[t] && d.typer[t].length) { flate[t] = d.typer[t]; typeRekkefolge.push(t); }
+            if (d.typer[t] && d.typer[t].length) { flate[t] = d.typer[t]; typeRekkefolge.push(t); typeKat[t] = kat; }
           });
         })
         .catch(function () {});
     }
-    flate = {}; typeRekkefolge = [];
-    return hent('motorvogner.json').then(function () { return hent('lok.json'); });
+    flate = {}; typeRekkefolge = []; typeKat = {};
+    return hent('motorvogner.json', 'Motorvogn').then(function () { return hent('lok.json', 'Lok'); });
   }
 
   // ---------- Bildekomprimering ----------
@@ -671,7 +676,8 @@ input[type="file"] {
     $('statTotal').textContent = total;
     $('statVenter').textContent = enheter.filter(function (e) { return e.status === 'venter'; }).length;
     $('statUkjent').textContent = enheter.filter(function (e) { return e.status === 'ukjent'; }).length;
-    if (aktivVisning === 'typer') { if (apenType) renderType(apenType); else renderTyper(); }
+    $('lokTab').style.display = typeRekkefolge.some(function (t) { return typeKat[t] === 'Lok'; }) ? '' : 'none';
+    if (erTypeVisning()) { if (apenType) renderType(apenType); else renderTyper(); }
     if (aktivVisning === 'bilder') renderBilder();
   }
 
@@ -679,7 +685,7 @@ input[type="file"] {
     aktivVisning = v;
     apenType = null;
     document.querySelectorAll('.view-btn').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-view') === v); });
-    $('typerArea').style.display = v === 'typer' ? 'block' : 'none';
+    $('typerArea').style.display = erTypeVisning() ? 'block' : 'none';
     $('bilderArea').style.display = v === 'bilder' ? 'block' : 'none';
     $('adminArea').style.display = v === 'admin' ? 'block' : 'none';
     if (v === 'admin') lastInnAdmin(); else oppdaterAlt();
@@ -696,22 +702,35 @@ input[type="file"] {
       area.innerHTML = '<div class="empty"><h3>Fant ingen togtyper</h3><p>Sjekk at public/flate/motorvogner.json er lastet opp.</p></div>';
       return;
     }
-    var wrap = document.createElement('div');
-    wrap.className = 'type-chips store';
-    typeRekkefolge.forEach(function (t) {
-      var koder = flate[t];
-      var sett = koder.filter(function (k) { var e = finnEnhet(t, k); return e && e.status === 'godkjent'; }).length;
-      var venter = koder.filter(function (k) { var e = finnEnhet(t, k); return e && e.status === 'venter'; }).length;
-      var chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = 'type-chip' + (sett > 0 ? ' harsett' : '') + (sett === koder.length ? ' komplett' : '');
-      chip.innerHTML = '<span class="type-chip-navn">' + esc(t) + (sett === koder.length ? ' 🏆' : '') + '</span>' +
-        '<span class="type-chip-antall">' + sett + ' / ' + koder.length + ' sett' + (venter ? ' · ' + venter + ' venter' : '') + '</span>' +
-        '<span class="type-chip-bar"><i style="width:' + Math.round(100 * sett / koder.length) + '%"></i></span>';
-      chip.addEventListener('click', function () { apenType = t; renderType(t); window.scrollTo(0, 0); });
-      wrap.appendChild(chip);
+    [[aktivKat(), aktivKat() === 'Lok' ? 'Lok' : 'Motorvognsett']].forEach(function (par) {
+      var typer = typeRekkefolge.filter(function (t) { return typeKat[t] === par[0]; });
+      if (!typer.length) { area.innerHTML = '<div class="empty"><h3>Ingen typer her ennå</h3></div>'; return; }
+      var totalt = 0, settTotalt = 0;
+      typer.forEach(function (t) {
+        totalt += flate[t].length;
+        flate[t].forEach(function (k) { var e = finnEnhet(t, k); if (e && e.status === 'godkjent') settTotalt++; });
+      });
+      var seksjon = document.createElement('div');
+      seksjon.className = 'type-seksjon';
+      seksjon.innerHTML = '<h2 class="type-seksjon-tittel">' + par[1] + ' <small>' + settTotalt + ' / ' + totalt + ' sett</small></h2>';
+      var wrap = document.createElement('div');
+      wrap.className = 'type-chips store';
+      typer.forEach(function (t) {
+        var koder = flate[t];
+        var sett = koder.filter(function (k) { var e = finnEnhet(t, k); return e && e.status === 'godkjent'; }).length;
+        var venter = koder.filter(function (k) { var e = finnEnhet(t, k); return e && e.status === 'venter'; }).length;
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'type-chip' + (sett > 0 ? ' harsett' : '') + (sett === koder.length ? ' komplett' : '');
+        chip.innerHTML = '<span class="type-chip-navn">' + esc(t) + (sett === koder.length ? ' 🏆' : '') + '</span>' +
+          '<span class="type-chip-antall">' + sett + ' / ' + koder.length + ' sett' + (venter ? ' · ' + venter + ' venter' : '') + '</span>' +
+          '<span class="type-chip-bar"><i style="width:' + Math.round(100 * sett / koder.length) + '%"></i></span>';
+        chip.addEventListener('click', function () { apenType = t; renderType(t); window.scrollTo(0, 0); });
+        wrap.appendChild(chip);
+      });
+      seksjon.appendChild(wrap);
+      area.appendChild(seksjon);
     });
-    area.appendChild(wrap);
   }
 
   // Togtyper – én type med alle numre
@@ -720,7 +739,7 @@ input[type="file"] {
     var koder = flate[t] || [];
     var sett = koder.filter(function (k) { var e = finnEnhet(t, k); return e && e.status === 'godkjent'; }).length;
     area.innerHTML =
-      '<div class="type-detalj-topp"><button type="button" class="btn" id="tilbakeTyper">← Alle togtyper</button></div>' +
+      '<div class="type-detalj-topp"><button type="button" class="btn" id="tilbakeTyper">← Alle ' + (typeKat[t] === 'Lok' ? 'lok' : 'motorvognsett') + '</button></div>' +
       '<h2 class="type-detalj-tittel">' + esc(t) + '</h2>' +
       '<div class="fremdrift"><div class="fremdrift-tekst"><b>' + sett + '</b> av ' + koder.length + ' sett</div>' +
       '<div class="fremdrift-bar"><i style="width:' + Math.round(100 * sett / (koder.length || 1)) + '%"></i></div></div>';
@@ -768,7 +787,7 @@ input[type="file"] {
       card.innerHTML = '<div class="thumb">' + (e.litenUrl ? '<img loading="lazy" alt="" src="' + esc(e.litenUrl) + '">' : '') + '</div>';
       var info = document.createElement('div');
       info.className = 'info';
-      info.innerHTML = (e.type ? '<span class="badge motorvogn">' + esc(e.type) + '</span>' : '');
+      info.innerHTML = (e.type ? '<span class="badge ' + (typeKat[e.type] === 'Lok' ? 'lok' : 'motorvogn') + '">' + esc(e.type) + '</span>' : '');
       info.appendChild(lagStatus(e));
       info.insertAdjacentHTML('beforeend', '<div class="tittel">' + esc(e.kode || 'Ukjent nummer') + '</div>' +
         '<div class="meta">' + esc(formatDato(e.dato)) + '</div>');
@@ -785,8 +804,12 @@ input[type="file"] {
   function lagVelger(enhet, ferdig) {
     var boks = document.createElement('div');
     boks.className = 'velger';
-    var typeValg = '<option value="">Velg type …</option>' + typeRekkefolge.map(function (t) {
-      return '<option' + (t === enhet.type ? ' selected' : '') + '>' + esc(t) + '</option>';
+    var typeValg = '<option value="">Velg type …</option>' + [['Motorvogn', 'Motorvognsett'], ['Lok', 'Lok']].map(function (par) {
+      var typer = typeRekkefolge.filter(function (t) { return typeKat[t] === par[0]; });
+      if (!typer.length) return '';
+      return '<optgroup label="' + par[1] + '">' + typer.map(function (t) {
+        return '<option' + (t === enhet.type ? ' selected' : '') + '>' + esc(t) + '</option>';
+      }).join('') + '</optgroup>';
     }).join('');
     boks.innerHTML =
       '<div class="velger-rad"><select class="v-type">' + typeValg + '</select>' +
