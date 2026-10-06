@@ -360,6 +360,7 @@ input[type="file"] {
 }
 .last-opp-knapp:hover { background: #3f7bdc; }
 .last-opp-knapp:active { transform: scale(0.97); }
+.type-seksjon-tittel small { font-size: 14px; font-weight: 500; color: var(--ink-soft); margin-left: 8px; }
 .type-chips.store { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
 .type-chips.store .type-chip { padding: 16px; }
 .type-chips.store .type-chip-navn { font-size: 18px; }
@@ -433,7 +434,8 @@ input[type="file"] {
   </header>
 
   <div class="view-switch">
-    <button class="view-btn active" data-view="typer">Togtyper</button>
+    <button class="view-btn active" data-view="motorvogn">Motorvognsett</button>
+    <button class="view-btn" data-view="lok" id="lokTab">Lok</button>
     <button class="view-btn" data-view="bilder">Mine bilder</button>
     <button class="view-btn" data-view="admin" id="adminTab" style="display:none;">Godkjenning <span class="tab-teller" id="adminTeller"></span></button>
   </div>
@@ -501,7 +503,9 @@ input[type="file"] {
   var flate = {};          // { "BM 72": ["72-01", ...], ... }
   var typeRekkefolge = [];
   var typeKat = {};        // { "BM 72": "Motorvogn", "EL18": "Lok" }
-  var aktivVisning = 'typer';
+  var aktivVisning = 'motorvogn';
+  function erTypeVisning() { return aktivVisning === 'motorvogn' || aktivVisning === 'lok'; }
+  function aktivKat() { return aktivVisning === 'lok' ? 'Lok' : 'Motorvogn'; }
   var apenType = null;
   var aktivStatus = 'alle';
   var valgtId = null;
@@ -672,7 +676,8 @@ input[type="file"] {
     $('statTotal').textContent = total;
     $('statVenter').textContent = enheter.filter(function (e) { return e.status === 'venter'; }).length;
     $('statUkjent').textContent = enheter.filter(function (e) { return e.status === 'ukjent'; }).length;
-    if (aktivVisning === 'typer') { if (apenType) renderType(apenType); else renderTyper(); }
+    $('lokTab').style.display = typeRekkefolge.some(function (t) { return typeKat[t] === 'Lok'; }) ? '' : 'none';
+    if (erTypeVisning()) { if (apenType) renderType(apenType); else renderTyper(); }
     if (aktivVisning === 'bilder') renderBilder();
   }
 
@@ -680,7 +685,7 @@ input[type="file"] {
     aktivVisning = v;
     apenType = null;
     document.querySelectorAll('.view-btn').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-view') === v); });
-    $('typerArea').style.display = v === 'typer' ? 'block' : 'none';
+    $('typerArea').style.display = erTypeVisning() ? 'block' : 'none';
     $('bilderArea').style.display = v === 'bilder' ? 'block' : 'none';
     $('adminArea').style.display = v === 'admin' ? 'block' : 'none';
     if (v === 'admin') lastInnAdmin(); else oppdaterAlt();
@@ -697,12 +702,17 @@ input[type="file"] {
       area.innerHTML = '<div class="empty"><h3>Fant ingen togtyper</h3><p>Sjekk at public/flate/motorvogner.json er lastet opp.</p></div>';
       return;
     }
-    [['Motorvogn', 'Motorvognsett'], ['Lok', 'Lok']].forEach(function (par) {
+    [[aktivKat(), aktivKat() === 'Lok' ? 'Lok' : 'Motorvognsett']].forEach(function (par) {
       var typer = typeRekkefolge.filter(function (t) { return typeKat[t] === par[0]; });
-      if (!typer.length) return;
+      if (!typer.length) { area.innerHTML = '<div class="empty"><h3>Ingen typer her ennå</h3></div>'; return; }
+      var totalt = 0, settTotalt = 0;
+      typer.forEach(function (t) {
+        totalt += flate[t].length;
+        flate[t].forEach(function (k) { var e = finnEnhet(t, k); if (e && e.status === 'godkjent') settTotalt++; });
+      });
       var seksjon = document.createElement('div');
       seksjon.className = 'type-seksjon';
-      seksjon.innerHTML = '<h2 class="type-seksjon-tittel">' + par[1] + '</h2>';
+      seksjon.innerHTML = '<h2 class="type-seksjon-tittel">' + par[1] + ' <small>' + settTotalt + ' / ' + totalt + ' sett</small></h2>';
       var wrap = document.createElement('div');
       wrap.className = 'type-chips store';
       typer.forEach(function (t) {
@@ -729,7 +739,7 @@ input[type="file"] {
     var koder = flate[t] || [];
     var sett = koder.filter(function (k) { var e = finnEnhet(t, k); return e && e.status === 'godkjent'; }).length;
     area.innerHTML =
-      '<div class="type-detalj-topp"><button type="button" class="btn" id="tilbakeTyper">← Alle togtyper</button></div>' +
+      '<div class="type-detalj-topp"><button type="button" class="btn" id="tilbakeTyper">← Alle ' + (typeKat[t] === 'Lok' ? 'lok' : 'motorvognsett') + '</button></div>' +
       '<h2 class="type-detalj-tittel">' + esc(t) + '</h2>' +
       '<div class="fremdrift"><div class="fremdrift-tekst"><b>' + sett + '</b> av ' + koder.length + ' sett</div>' +
       '<div class="fremdrift-bar"><i style="width:' + Math.round(100 * sett / (koder.length || 1)) + '%"></i></div></div>';
