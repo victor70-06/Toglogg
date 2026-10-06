@@ -1,5 +1,5 @@
 import { getUserFromRequest, json } from "../../_lib/auth.js";
-import { KOLONNER, tilEnhet } from "../../_lib/enheter.js";
+import { KOLONNER, tilEnhet, normaliserKode } from "../../_lib/enheter.js";
 
 export async function onRequestGet({ request, env }) {
   const user = await getUserFromRequest(request, env.DB);
@@ -24,7 +24,7 @@ export async function onRequestPost({ request, env }) {
   const kategori = body.kategori;
   const tittel = (body.tittel || "").trim();
   const type = (body.type || "").trim();
-  const kode = (body.kode || "").trim();
+  const kode = normaliserKode(body.kode);
   const sted = (body.sted || "").trim();
   const dato = body.dato || "";
   const notat = (body.notat || "").trim();

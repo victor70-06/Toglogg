@@ -9,7 +9,7 @@ export async function onRequestGet({ request, env }) {
 
   const { results } = await env.DB.prepare(
     "SELECT e.id, e.user_id, e.kategori, e.type, e.kode, e.tittel, e.sted, e.dato, e.notat, e.bilde_key, " +
-      "(e.data_url IS NOT NULL) AS har_gammelt_bilde, e.status, e.avvist_grunn, e.vurdert_tid, e.opprettet, u.username " +
+      "(e.data_url IS NOT NULL) AS har_gammelt_bilde, e.status, e.avvist_grunn, e.vurdert_av, e.vurdert_tid, e.ai_notat, e.opprettet, u.username " +
       "FROM enheter e JOIN users u ON u.id = e.user_id WHERE e.status = 'venter' ORDER BY e.opprettet ASC"
   ).all();
 

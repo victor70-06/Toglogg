@@ -1,0 +1,21 @@
+{
+ "kategori": "Lok",
+ "beskrivelse": "Fyll inn kjente enheter per type når du har listen, f.eks. \"El 18\": [\"2241\", \"2242\"].",
+ "typer": {
+  "El 14": [],
+  "El 15": [],
+  "El 16": [],
+  "El 17": [],
+  "El 18": [],
+  "Di 3": [],
+  "Di 4": [],
+  "Di 6": [],
+  "Di 8": [],
+  "Di 9": [],
+  "Rc": [],
+  "Iore": [],
+  "Euro 4000": [],
+  "Vectron": [],
+  "CD 66": []
+ }
+}

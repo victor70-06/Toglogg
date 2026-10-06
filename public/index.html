@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+
 :root {
   --bg: #0b0e13;
   --bg-2: #12161d;
@@ -305,11 +306,83 @@ input[type="file"] {
 .kontroll-info .modal-actions { margin-top: 4px; }
 @media (max-width: 700px) { .kontroll-kort { grid-template-columns: 1fr; } }
 
+/* ---------- Flåte-rutenett ---------- */
+.fremdrift { margin: 0 0 16px; }
+.fremdrift-tekst { color: var(--cream); font-size: 15px; margin-bottom: 6px; }
+.fremdrift-bar, .type-chip-bar { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.fremdrift-bar i, .type-chip-bar i { display: block; height: 100%; background: var(--motorvogn); border-radius: 999px; }
+.type-chip-bar { width: 100%; height: 4px; margin-top: 4px; }
+.type-seksjon.lok .type-chip-bar i { background: var(--lok); }
+.hjelp { font-size: 13px; color: var(--ink-soft); margin-top: 8px; }
+.enhet-rutenett { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; margin-bottom: 10px; }
+.enhet-rute {
+  font-family: var(--font-body); font-weight: 600; font-size: 14px; padding: 12px 4px; border-radius: 8px;
+  cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--ink-soft);
+  transition: transform 0.1s ease, border-color 0.15s ease;
+}
+.enhet-rute:hover { transform: translateY(-1px); border-color: var(--line-soft); }
+.enhet-rute.jobber { opacity: 0.5; cursor: progress; }
+.r-ikke { border-style: dashed !important; }
+.r-uten_bilde { border-style: dashed !important; color: var(--ink) !important; }
+.r-venter { background: var(--venter-bg) !important; border-color: var(--venter) !important; color: var(--venter-ink) !important; }
+.r-godkjent { background: var(--motorvogn-bg) !important; border-color: var(--motorvogn) !important; color: var(--motorvogn-ink) !important; }
+.r-avvist { background: var(--avvist-bg) !important; border-color: var(--avvist) !important; color: var(--avvist-ink) !important; }
+.forklaring { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 22px; font-size: 12px; }
+.forklaring span { padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-soft); }
+.liste-tittel { font-size: 16px; color: var(--cream); margin: 22px 0 0; }
+.kontroll-ai { font-size: 13px; color: var(--ink-soft); background: var(--panel-2); border-radius: 8px; padding: 8px 10px; }
+
+/* ---------- Melding ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+  background: var(--panel-2); color: var(--ink); border: 1px solid var(--line-soft); border-radius: 10px;
+  padding: 12px 18px; font-size: 14px; box-shadow: var(--shadow); transition: all 0.2s ease; z-index: 100;
+  max-width: calc(100% - 32px);
+}
+.toast.vis { opacity: 1; transform: translate(-50%, 0); }
+.toast.ok { border-color: var(--motorvogn); }
+.toast.feil { border-color: var(--avvist); }
+.toast.venter { border-color: var(--venter); }
+
 @media (max-width: 480px) {
   header.hero { padding: 32px 0 22px; }
   .stats { gap: 18px; }
   .auth-box { margin: 32px auto; }
 }
+
+
+/* ---------- Ny opplasting / oversikt ---------- */
+.stat .n small { font-size: 18px; color: var(--ink-soft); font-weight: 600; }
+.last-opp-knapp {
+  display: inline-flex; align-items: center; gap: 8px; margin: 0; cursor: pointer;
+  font-family: var(--font-body); font-weight: 700; font-size: 16px; padding: 15px 26px;
+  background: var(--lok); color: #fff !important; border-radius: var(--radius); transition: transform 0.12s ease, background 0.15s ease;
+}
+.last-opp-knapp:hover { background: #3f7bdc; }
+.last-opp-knapp:active { transform: scale(0.97); }
+.type-chips.store { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+.type-chips.store .type-chip { padding: 16px; }
+.type-chips.store .type-chip-navn { font-size: 18px; }
+.type-chips.store .type-chip.harsett { border-color: var(--motorvogn); background: var(--motorvogn-bg); }
+.type-chip.komplett { border-color: #e0a43a !important; }
+.enhet-rute:disabled { cursor: default; opacity: 0.75; }
+.enhet-rute:disabled:hover { transform: none; }
+.enhet-rute.med-bilde { background-size: cover; background-position: center; position: relative; overflow: hidden; color: #fff !important; }
+.enhet-rute.med-bilde::before { content: ""; position: absolute; inset: 0; background: rgba(10, 60, 50, 0.55); }
+.enhet-rute.med-bilde span { position: relative; }
+.resultat-rad { display: flex; gap: 14px; align-items: flex-start; padding: 12px; border: 1px solid var(--line-soft); border-radius: 10px; margin-bottom: 10px; }
+.resultat-rad.jobber { opacity: 0.7; }
+.resultat-rad.ok { border-color: var(--motorvogn); background: var(--motorvogn-bg); }
+.resultat-rad.venter { border-color: var(--venter); }
+.resultat-rad.feil { border-color: var(--avvist); }
+.resultat-bilde { width: 96px; height: 72px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: #0e1a22; }
+.resultat-tekst { flex: 1; min-width: 0; }
+.resultat-tittel { font-weight: 700; font-size: 16px; color: var(--ink); }
+.resultat-under { font-size: 13.5px; color: var(--ink-soft); margin-top: 3px; line-height: 1.4; }
+.velger { margin-top: 10px; }
+.velger-rad { display: flex; flex-wrap: wrap; gap: 8px; }
+.velger-rad select { flex: 1; min-width: 120px; width: auto; }
+#viewVelger .velger { margin-top: 12px; }
 
 </style>
 </head>
@@ -318,23 +391,18 @@ input[type="file"] {
 <div class="wrap" id="authScreen" style="display:none;">
   <div class="auth-box">
     <p class="board-label">Toglogg</p>
-    <h1 class="auth-h1">Din reisedagbok for lok og motorvogner</h1>
+    <h1 class="auth-h1">Samle alle motorvognsettene</h1>
     <p class="sub">Logg inn for å se samlingen din, eller opprett en bruker hvis du er ny.</p>
-
     <div class="auth-tabs">
       <button class="auth-tab active" data-mode="login">Logg inn</button>
       <button class="auth-tab" data-mode="register">Opprett bruker</button>
     </div>
-
     <form id="authForm">
       <label for="usernameInput">Brukernavn</label>
       <input type="text" id="usernameInput" autocomplete="username" placeholder="ditt-brukernavn">
-
       <label for="passwordInput">Passord</label>
       <input type="password" id="passwordInput" autocomplete="current-password" placeholder="Minst 6 tegn">
-
       <div class="form-error" id="authError"></div>
-
       <div class="modal-actions">
         <button type="submit" class="btn save" id="authSubmit">Logg inn</button>
       </div>
@@ -343,152 +411,103 @@ input[type="file"] {
 </div>
 
 <div class="wrap" id="appScreen" style="display:none;">
-
   <header class="hero">
     <div class="hero-top">
       <p class="board-label">Toglogg</p>
       <button class="btn" id="logoutBtn">Logg ut (<span id="whoami"></span>)</button>
     </div>
-    <h1>Hver reise du tar. Et helt liv på skinner.</h1>
-    <p class="sub">Last opp bilde av hvert lok og hver motorvogn du ser. Når bildet er kontrollert og godkjent, er den krysset av som sett.</p>
+    <h1>Hvor mange har du sett?</h1>
+    <p class="sub">Last opp et bilde, så finner AI ut hvilket tog og nummer det er og krysser det av.</p>
     <div class="hero-row">
       <div class="stats">
-        <div class="stat"><span class="n" id="statTotal">0</span><span class="l">sett (godkjent)</span></div>
-        <div class="stat"><span class="n" id="statLok">0</span><span class="l">lok</span></div>
-        <div class="stat"><span class="n" id="statMotorvogn">0</span><span class="l">motorvogner</span></div>
+        <div class="stat"><span class="n"><span id="statSett">0</span><small> / <span id="statTotal">0</span></small></span><span class="l">sett</span></div>
         <div class="stat"><span class="n" id="statVenter">0</span><span class="l">venter kontroll</span></div>
+        <div class="stat"><span class="n" id="statUkjent">0</span><span class="l">mangler nummer</span></div>
       </div>
-      <button class="primary" id="addBtn">Legg til</button>
+      <label class="primary last-opp-knapp">
+        📷 Last opp bilde
+        <input type="file" id="opplastingInput" accept="image/*" multiple hidden>
+      </label>
     </div>
   </header>
 
   <div class="view-switch">
-    <button class="view-btn active" data-view="bilder">Bilder</button>
-    <button class="view-btn" data-view="typer">Typer</button>
+    <button class="view-btn active" data-view="typer">Togtyper</button>
+    <button class="view-btn" data-view="bilder">Mine bilder</button>
     <button class="view-btn" data-view="admin" id="adminTab" style="display:none;">Godkjenning <span class="tab-teller" id="adminTeller"></span></button>
   </div>
 
-  <div id="bilderArea">
+  <div id="typerArea"></div>
+
+  <div id="bilderArea" style="display:none;">
     <div class="filters">
-      <button class="tab active" data-kat="alle">Alle</button>
-      <button class="tab" data-kat="Lok">Lok</button>
-      <button class="tab" data-kat="Motorvogn">Motorvogn</button>
-      <select id="typeFilter">
-        <option value="alle">Alle typer</option>
-      </select>
       <select id="statusFilter">
-        <option value="alle">Alle statuser</option>
-        <option value="godkjent">Sett (godkjent)</option>
+        <option value="alle">Alle bilder</option>
+        <option value="godkjent">Sett ✓</option>
         <option value="venter">Venter kontroll</option>
+        <option value="ukjent">Mangler nummer</option>
         <option value="avvist">Avvist</option>
-        <option value="uten_bilde">Mangler bilde</option>
       </select>
     </div>
-
     <div id="gridArea"></div>
   </div>
 
-  <div id="typerArea" style="display:none;"></div>
   <div id="adminArea" style="display:none;"></div>
 </div>
 
-<div class="overlay" id="addOverlay">
-  <div class="modal">
-    <button class="close-x" id="closeAdd" aria-label="Lukk">×</button>
-    <h2>Legg til lok / motorvogn</h2>
-    <form id="addForm">
-      <label for="fileInput">Bilde (sendes til kontroll – kan også legges til senere)</label>
-      <input type="file" id="fileInput" accept="image/*">
-      <img class="preview" id="previewImg" alt="">
-
-      <label>Kategori</label>
-      <div class="cat-choice">
-        <button type="button" class="cat-btn lok" data-kat="Lok">Lok</button>
-        <button type="button" class="cat-btn motorvogn" data-kat="Motorvogn">Motorvogn</button>
-      </div>
-
-      <label for="typeInput">Type</label>
-      <input type="text" id="typeInput" list="typeSuggestions" placeholder="F.eks. El 18">
-      <datalist id="typeSuggestions"></datalist>
-
-      <label for="kodeInput">Kode (lok- eller vognnummer)</label>
-      <input type="text" id="kodeInput" placeholder="F.eks. 72-06">
-
-      <label for="tittelInput">Tittel (valgfritt hvis du har fylt inn kode)</label>
-      <input type="text" id="tittelInput" placeholder="F.eks. NSB El 18 ved Oslo S">
-      <div class="form-error" id="tittelError">Skriv inn enten en tittel eller en kode.</div>
-
-      <label for="stedInput">Sted (valgfritt)</label>
-      <input type="text" id="stedInput" placeholder="F.eks. Oslo S">
-
-      <label for="datoInput">Dato (valgfritt)</label>
-      <input type="date" id="datoInput">
-
-      <label for="notatInput">Notat (valgfritt)</label>
-      <textarea id="notatInput" placeholder="Detaljer om bildet, osv."></textarea>
-
-      <div class="form-error" id="saveError"></div>
-
-      <div class="modal-actions">
-        <button type="button" class="btn" id="cancelAdd">Avbryt</button>
-        <button type="submit" class="btn save" id="saveBtn">Lagre</button>
-      </div>
-    </form>
+<div class="overlay" id="resultatOverlay">
+  <div class="modal wide">
+    <button class="close-x" id="lukkResultat" aria-label="Lukk">×</button>
+    <h2>Opplasting</h2>
+    <div id="resultatListe"></div>
+    <div class="modal-actions">
+      <button class="btn save" id="ferdigResultat">Ferdig</button>
+    </div>
   </div>
 </div>
 
 <div class="overlay" id="viewOverlay">
   <div class="modal wide">
     <button class="close-x" id="closeView" aria-label="Lukk">×</button>
-    <img class="view-img" id="viewImg" alt="" style="display:none;">
-    <div class="view-img placeholder" id="viewPlaceholder">
-      <i>Ingen bilde ennå</i>
-    </div>
+    <img class="view-img" id="viewImg" alt="">
     <div class="view-info">
-      <span class="badge" id="viewBadge"></span>
+      <span class="badge motorvogn" id="viewBadge"></span>
       <span class="status" id="viewStatus"></span>
-      <div class="avvist-boks" id="viewAvvist"></div>
       <div class="view-title" id="viewTitle"></div>
       <div class="view-meta" id="viewMeta"></div>
-      <div class="view-note" id="viewNote"></div>
+      <div class="avvist-boks" id="viewInfo"></div>
+      <div id="viewVelger"></div>
     </div>
-    <input type="file" id="viewFileInput" accept="image/*" style="display:none;">
     <div class="modal-actions">
-      <button class="btn" id="addPhotoBtn">Legg til bilde</button>
-      <button class="btn danger" id="deleteBtn">Slett</button>
+      <button class="btn danger" id="deleteBtn">Slett bildet</button>
     </div>
   </div>
 </div>
 
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script>
 (function () {
-  var lokTyper = ['El 14', 'El 15', 'El 16', 'El 17', 'El 18', 'Di 3', 'Di 4', 'Di 6', 'Di 8', 'Di 9', 'Rc', 'Iore', 'Euro 4000', 'Vectron', 'CD 66'];
-  var motorvognTyper = ['BM 69', 'BM 70', 'BM 71', 'BM 72', 'BM 73', 'BM 74', 'BM 75', 'BM 76', 'BM 92', 'BM 93', 'Flirt', 'Talent 3'];
-  var UTEN_TYPE = 'Uten type';
-
   var STATUS = {
-    uten_bilde: { tekst: 'Mangler bilde', klasse: 'st-mangler' },
+    ukjent: { tekst: 'Mangler nummer', klasse: 'st-mangler' },
     venter: { tekst: 'Venter kontroll', klasse: 'st-venter' },
     godkjent: { tekst: 'Sett ✓', klasse: 'st-godkjent' },
     avvist: { tekst: 'Avvist', klasse: 'st-avvist' },
+    uten_bilde: { tekst: 'Mangler bilde', klasse: 'st-mangler' },
   };
 
   var enheter = [];
-  var bruker = null;
-  var aktivKategori = 'alle';
-  var aktivType = 'alle';
+  var flate = {};          // { "BM 72": ["72-01", ...], ... }
+  var typeRekkefolge = [];
+  var aktivVisning = 'typer';
+  var apenType = null;
   var aktivStatus = 'alle';
-  var valgtKategoriForm = null;
   var valgtId = null;
-  var valgtFil = null;
   var authMode = 'login';
-  var aktivVisning = 'bilder';
-  var apenType = null; // { kategori, type } når man har klikket inn i en type
-
-  var authScreen = document.getElementById('authScreen');
-  var appScreen = document.getElementById('appScreen');
 
   // ---------- Hjelpere ----------
+
+  function $(id) { return document.getElementById(id); }
 
   function api(path, opts) {
     opts = opts || {};
@@ -509,42 +528,78 @@ input[type="file"] {
   }
 
   function formatDato(iso) {
-    var deler = (iso || '').split('-');
-    if (deler.length !== 3) return iso || '';
-    return deler[2] + '.' + deler[1] + '.' + deler[0];
+    var d = (iso || '').split('-');
+    return d.length === 3 ? d[2] + '.' + d[1] + '.' + d[0] : (iso || '');
+  }
+
+  function visMelding(tekst, type) {
+    var el = $('toast');
+    el.textContent = tekst;
+    el.className = 'toast vis ' + (type || '');
+    clearTimeout(visMelding.t);
+    visMelding.t = setTimeout(function () { el.className = 'toast'; }, 5000);
+  }
+
+  function statusFor(e) {
+    var s = STATUS[e.status] || STATUS.ukjent;
+    if (e.status === 'godkjent' && e.vurdertAvAi) return { tekst: 'Sett ✓ (AI)', klasse: s.klasse };
+    return s;
   }
 
   function lagStatus(e) {
-    var s = STATUS[e.status] || STATUS.uten_bilde;
+    var s = statusFor(e);
     var el = document.createElement('span');
     el.className = 'status ' + s.klasse;
     el.textContent = s.tekst;
     return el;
   }
 
-  function erSett(e) { return e.status === 'godkjent'; }
+  function erstattEnhet(ny) {
+    var i = enheter.findIndex(function (x) { return x.id === ny.id; });
+    if (i === -1) enheter.push(ny); else enheter[i] = ny;
+  }
 
-  // Komprimerer bildet i nettleseren til en JPEG-blob før opplasting.
-  // Holder det under ca. 1,8 MB (grensen i databasen er 2 MB).
-  var MAKS_BYTES = 1800000;
-  function komprimerBilde(fil, maxBredde) {
+  function finnEnhet(type, kode) {
+    return enheter.find(function (e) { return e.type === type && e.kode === kode; });
+  }
+
+  // ---------- Flåteliste ----------
+
+  function lastInnFlate() {
+    function hent(fil) {
+      return fetch('/flate/' + fil, { cache: 'no-cache' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          if (!d || !d.typer) return;
+          Object.keys(d.typer).forEach(function (t) {
+            if (d.typer[t] && d.typer[t].length) { flate[t] = d.typer[t]; typeRekkefolge.push(t); }
+          });
+        })
+        .catch(function () {});
+    }
+    flate = {}; typeRekkefolge = [];
+    return hent('motorvogner.json').then(function () { return hent('lok.json'); });
+  }
+
+  // ---------- Bildekomprimering ----------
+
+  function komprimerBilde(fil, maxBredde, maksBytes) {
     return new Promise(function (resolve, reject) {
       var url = URL.createObjectURL(fil);
       var image = new Image();
       image.onerror = function () { URL.revokeObjectURL(url); reject(new Error('Kunne ikke lese bildet.')); };
       image.onload = function () {
         URL.revokeObjectURL(url);
-        var forsok = [[maxBredde, 0.82], [maxBredde, 0.7], [1280, 0.7], [1024, 0.6]];
+        var forsok = [[maxBredde, 0.82], [maxBredde, 0.7], [Math.min(1280, maxBredde), 0.7], [Math.min(1024, maxBredde), 0.6], [800, 0.6]];
         function prov(i) {
           var bredde = Math.min(forsok[i][0], image.width);
-          var skala = bredde / image.width;
           var canvas = document.createElement('canvas');
-          canvas.width = Math.round(image.width * skala);
-          canvas.height = Math.round(image.height * skala);
+          canvas.width = Math.round(bredde);
+          canvas.height = Math.round(image.height * bredde / image.width);
           canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
           canvas.toBlob(function (blob) {
             if (!blob) return reject(new Error('Kunne ikke komprimere bildet.'));
-            if (blob.size <= MAKS_BYTES || i === forsok.length - 1) return resolve(blob);
+            if (blob.size <= maksBytes || i === forsok.length - 1) return resolve(blob);
             prov(i + 1);
           }, 'image/jpeg', forsok[i][1]);
         }
@@ -554,54 +609,20 @@ input[type="file"] {
     });
   }
 
-  // Laster opp bilde til kontoen. Enheten går til «venter kontroll».
-  function lastOppBilde(id, fil) {
-    return komprimerBilde(fil, 1600).then(function (blob) {
-      return fetch('/api/photos/' + id + '/bilde', {
-        method: 'PUT',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'image/jpeg' },
-        body: blob,
-      });
-    }).then(function (res) {
-      return res.json().catch(function () { return {}; }).then(function (data) {
-        if (!res.ok) throw new Error(data.error || 'Opplastingen feilet.');
-        return data.enhet;
-      });
-    });
-  }
-
-  function erstattEnhet(ny) {
-    var i = enheter.findIndex(function (x) { return x.id === ny.id; });
-    if (i === -1) enheter.push(ny); else enheter[i] = ny;
-  }
-
-  function oppdaterAlt() {
-    oppdaterTypeFilter();
-    oppdaterStats();
-    renderGrid();
-    if (aktivVisning === 'typer') {
-      if (apenType) renderTypeDetalj(apenType.kategori, apenType.type);
-      else renderTyperOversikt();
-    }
-  }
-
-  // ---------- Autentisering ----------
+  // ---------- Innlogging ----------
 
   function visApp(b) {
-    bruker = b;
-    document.getElementById('whoami').textContent = b.username;
-    document.getElementById('adminTab').style.display = b.isAdmin ? '' : 'none';
-    authScreen.style.display = 'none';
-    appScreen.style.display = 'block';
-    lastInn();
+    $('whoami').textContent = b.username;
+    $('adminTab').style.display = b.isAdmin ? '' : 'none';
+    $('authScreen').style.display = 'none';
+    $('appScreen').style.display = 'block';
+    lastInnFlate().then(lastInn);
     if (b.isAdmin) oppdaterAdminTeller();
   }
 
   function visAuth() {
-    bruker = null;
-    authScreen.style.display = 'block';
-    appScreen.style.display = 'none';
+    $('authScreen').style.display = 'block';
+    $('appScreen').style.display = 'none';
   }
 
   api('/auth/me').then(function (d) { visApp(d.user); }).catch(visAuth);
@@ -611,549 +632,345 @@ input[type="file"] {
       document.querySelectorAll('.auth-tab').forEach(function (t) { t.classList.remove('active'); });
       tab.classList.add('active');
       authMode = tab.getAttribute('data-mode');
-      document.getElementById('authSubmit').textContent = authMode === 'login' ? 'Logg inn' : 'Opprett bruker';
-      document.getElementById('authError').style.display = 'none';
+      $('authSubmit').textContent = authMode === 'login' ? 'Logg inn' : 'Opprett bruker';
+      $('authError').style.display = 'none';
     });
   });
 
-  document.getElementById('authForm').addEventListener('submit', function (e) {
+  $('authForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    var errBox = document.getElementById('authError');
-    errBox.style.display = 'none';
+    $('authError').style.display = 'none';
     api(authMode === 'login' ? '/auth/login' : '/auth/register', {
       method: 'POST',
-      body: JSON.stringify({
-        username: document.getElementById('usernameInput').value.trim(),
-        password: document.getElementById('passwordInput').value,
-      }),
+      body: JSON.stringify({ username: $('usernameInput').value.trim(), password: $('passwordInput').value }),
     })
       .then(function (d) { visApp(d.user); })
-      .catch(function (err) { errBox.textContent = err.message; errBox.style.display = 'block'; });
+      .catch(function (err) { $('authError').textContent = err.message; $('authError').style.display = 'block'; });
   });
 
-  document.getElementById('logoutBtn').addEventListener('click', function () {
+  $('logoutBtn').addEventListener('click', function () {
     api('/auth/logout', { method: 'POST' }).finally(function () { enheter = []; visAuth(); });
   });
 
-  // ---------- Visningsbytte ----------
-
-  function byttVisning(v) {
-    aktivVisning = v;
-    apenType = null;
-    document.querySelectorAll('.view-btn').forEach(function (b) {
-      b.classList.toggle('active', b.getAttribute('data-view') === v);
-    });
-    document.getElementById('bilderArea').style.display = v === 'bilder' ? 'block' : 'none';
-    document.getElementById('typerArea').style.display = v === 'typer' ? 'block' : 'none';
-    document.getElementById('adminArea').style.display = v === 'admin' ? 'block' : 'none';
-    if (v === 'typer') renderTyperOversikt();
-    if (v === 'admin') lastInnAdmin();
-  }
-
-  document.querySelectorAll('.view-btn').forEach(function (btn) {
-    btn.addEventListener('click', function () { byttVisning(btn.getAttribute('data-view')); });
-  });
-
-  // ---------- Egne enheter ----------
+  // ---------- Data og visninger ----------
 
   function lastInn() {
-    api('/photos')
+    return api('/photos')
       .then(function (d) { enheter = d.enheter; oppdaterAlt(); })
       .catch(function () { enheter = []; oppdaterAlt(); });
   }
 
-  function oppdaterTypeFilter() {
-    var kilde = aktivKategori === 'alle' ? enheter : enheter.filter(function (e) { return e.kategori === aktivKategori; });
-    var typer = [];
-    kilde.forEach(function (e) { if (e.type && typer.indexOf(e.type) === -1) typer.push(e.type); });
-    typer.sort(function (a, b) { return a.localeCompare(b, 'no'); });
-    var sel = document.getElementById('typeFilter');
-    var forrige = sel.value;
-    sel.innerHTML = '<option value="alle">Alle typer</option>';
-    typer.forEach(function (t) {
-      var o = document.createElement('option');
-      o.value = t; o.textContent = t;
-      sel.appendChild(o);
+  function oppdaterAlt() {
+    var total = 0, sett = 0;
+    typeRekkefolge.forEach(function (t) {
+      total += flate[t].length;
+      flate[t].forEach(function (k) { var e = finnEnhet(t, k); if (e && e.status === 'godkjent') sett++; });
     });
-    aktivType = typer.indexOf(forrige) !== -1 ? forrige : 'alle';
-    sel.value = aktivType;
+    $('statSett').textContent = sett;
+    $('statTotal').textContent = total;
+    $('statVenter').textContent = enheter.filter(function (e) { return e.status === 'venter'; }).length;
+    $('statUkjent').textContent = enheter.filter(function (e) { return e.status === 'ukjent'; }).length;
+    if (aktivVisning === 'typer') { if (apenType) renderType(apenType); else renderTyper(); }
+    if (aktivVisning === 'bilder') renderBilder();
   }
 
-  function oppdaterStats() {
-    var sett = enheter.filter(erSett);
-    document.getElementById('statTotal').textContent = sett.length;
-    document.getElementById('statLok').textContent = sett.filter(function (e) { return e.kategori === 'Lok'; }).length;
-    document.getElementById('statMotorvogn').textContent = sett.filter(function (e) { return e.kategori === 'Motorvogn'; }).length;
-    document.getElementById('statVenter').textContent = enheter.filter(function (e) { return e.status === 'venter'; }).length;
+  function byttVisning(v) {
+    aktivVisning = v;
+    apenType = null;
+    document.querySelectorAll('.view-btn').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-view') === v); });
+    $('typerArea').style.display = v === 'typer' ? 'block' : 'none';
+    $('bilderArea').style.display = v === 'bilder' ? 'block' : 'none';
+    $('adminArea').style.display = v === 'admin' ? 'block' : 'none';
+    if (v === 'admin') lastInnAdmin(); else oppdaterAlt();
   }
+  document.querySelectorAll('.view-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () { byttVisning(btn.getAttribute('data-view')); });
+  });
 
-  function lagThumb(e) {
-    var thumb = document.createElement('div');
-    thumb.className = 'thumb';
-    if (e.bildeUrl) {
-      var img = document.createElement('img');
-      img.src = e.bildeUrl;
-      img.alt = e.tittel || '';
-      img.loading = 'lazy';
-      thumb.appendChild(img);
-    } else {
-      thumb.classList.add('thumb-empty');
-      thumb.innerHTML = '<span>Ingen bilde</span>';
-    }
-    return thumb;
-  }
-
-  function renderGrid() {
-    var area = document.getElementById('gridArea');
-    var liste = enheter.slice().sort(function (a, b) { return b.opprettet - a.opprettet; });
-    if (aktivKategori !== 'alle') liste = liste.filter(function (e) { return e.kategori === aktivKategori; });
-    if (aktivType !== 'alle') liste = liste.filter(function (e) { return e.type === aktivType; });
-    if (aktivStatus !== 'alle') liste = liste.filter(function (e) { return e.status === aktivStatus; });
-
-    if (liste.length === 0) {
-      var tom = enheter.length === 0;
-      area.innerHTML = '<div class="empty"><h3>' + (tom ? 'Ingen lagt inn ennå' : 'Ingen treff') + '</h3><p>' +
-        (tom ? 'Legg til det første loket eller den første motorvognen du har sett.' : 'Prøv et annet filter.') + '</p></div>';
+  // Togtyper – oversikt
+  function renderTyper() {
+    var area = $('typerArea');
+    area.innerHTML = '';
+    if (!typeRekkefolge.length) {
+      area.innerHTML = '<div class="empty"><h3>Fant ingen togtyper</h3><p>Sjekk at public/flate/motorvogner.json er lastet opp.</p></div>';
       return;
     }
+    var wrap = document.createElement('div');
+    wrap.className = 'type-chips store';
+    typeRekkefolge.forEach(function (t) {
+      var koder = flate[t];
+      var sett = koder.filter(function (k) { var e = finnEnhet(t, k); return e && e.status === 'godkjent'; }).length;
+      var venter = koder.filter(function (k) { var e = finnEnhet(t, k); return e && e.status === 'venter'; }).length;
+      var chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'type-chip' + (sett > 0 ? ' harsett' : '') + (sett === koder.length ? ' komplett' : '');
+      chip.innerHTML = '<span class="type-chip-navn">' + esc(t) + (sett === koder.length ? ' 🏆' : '') + '</span>' +
+        '<span class="type-chip-antall">' + sett + ' / ' + koder.length + ' sett' + (venter ? ' · ' + venter + ' venter' : '') + '</span>' +
+        '<span class="type-chip-bar"><i style="width:' + Math.round(100 * sett / koder.length) + '%"></i></span>';
+      chip.addEventListener('click', function () { apenType = t; renderType(t); window.scrollTo(0, 0); });
+      wrap.appendChild(chip);
+    });
+    area.appendChild(wrap);
+  }
 
+  // Togtyper – én type med alle numre
+  function renderType(t) {
+    var area = $('typerArea');
+    var koder = flate[t] || [];
+    var sett = koder.filter(function (k) { var e = finnEnhet(t, k); return e && e.status === 'godkjent'; }).length;
+    area.innerHTML =
+      '<div class="type-detalj-topp"><button type="button" class="btn" id="tilbakeTyper">← Alle togtyper</button></div>' +
+      '<h2 class="type-detalj-tittel">' + esc(t) + '</h2>' +
+      '<div class="fremdrift"><div class="fremdrift-tekst"><b>' + sett + '</b> av ' + koder.length + ' sett</div>' +
+      '<div class="fremdrift-bar"><i style="width:' + Math.round(100 * sett / (koder.length || 1)) + '%"></i></div></div>';
+    $('tilbakeTyper').addEventListener('click', function () { apenType = null; renderTyper(); });
+
+    var rutenett = document.createElement('div');
+    rutenett.className = 'enhet-rutenett';
+    koder.forEach(function (k) {
+      var e = finnEnhet(t, k);
+      var rute = document.createElement('button');
+      rute.type = 'button';
+      rute.className = 'enhet-rute ' + (e ? 'r-' + e.status : 'r-ikke');
+      if (e && e.litenUrl && e.status === 'godkjent') {
+        rute.classList.add('med-bilde');
+        rute.style.backgroundImage = 'url("' + e.litenUrl + '")';
+      }
+      rute.innerHTML = '<span>' + esc(k) + '</span>';
+      rute.title = e ? statusFor(e).tekst : 'Ikke sett ennå';
+      if (e) rute.addEventListener('click', function () { visEnhet(e.id); });
+      else rute.disabled = true;
+      rutenett.appendChild(rute);
+    });
+    area.appendChild(rutenett);
+    area.insertAdjacentHTML('beforeend',
+      '<div class="forklaring"><span class="r-ikke">Ikke sett</span><span class="r-venter">Venter</span>' +
+      '<span class="r-godkjent">Sett ✓</span><span class="r-avvist">Avvist</span></div>');
+  }
+
+  // Mine bilder
+  function renderBilder() {
+    var area = $('gridArea');
+    var liste = enheter.slice().sort(function (a, b) { return b.opprettet - a.opprettet; });
+    if (aktivStatus !== 'alle') liste = liste.filter(function (e) { return e.status === aktivStatus; });
+    if (!liste.length) {
+      area.innerHTML = '<div class="empty"><h3>' + (enheter.length ? 'Ingen treff' : 'Ingen bilder ennå') + '</h3><p>' +
+        (enheter.length ? 'Prøv et annet filter.' : 'Trykk «Last opp bilde» for å komme i gang.') + '</p></div>';
+      return;
+    }
     var grid = document.createElement('div');
     grid.className = 'grid';
     liste.forEach(function (e) {
       var card = document.createElement('div');
       card.className = 'card';
       card.addEventListener('click', function () { visEnhet(e.id); });
-      card.appendChild(lagThumb(e));
-
+      card.innerHTML = '<div class="thumb">' + (e.litenUrl ? '<img loading="lazy" alt="" src="' + esc(e.litenUrl) + '">' : '') + '</div>';
       var info = document.createElement('div');
       info.className = 'info';
-      var badge = document.createElement('span');
-      badge.className = 'badge ' + (e.kategori === 'Lok' ? 'lok' : 'motorvogn');
-      badge.textContent = e.kategori + (e.type ? ' · ' + e.type : '');
-      info.appendChild(badge);
+      info.innerHTML = (e.type ? '<span class="badge motorvogn">' + esc(e.type) + '</span>' : '');
       info.appendChild(lagStatus(e));
-
-      var tittel = document.createElement('div');
-      tittel.className = 'tittel';
-      tittel.textContent = e.kode || e.tittel;
-      info.appendChild(tittel);
-
-      var meta = document.createElement('div');
-      meta.className = 'meta';
-      meta.textContent = [e.sted, formatDato(e.dato)].filter(Boolean).join(' · ');
-      info.appendChild(meta);
-
+      info.insertAdjacentHTML('beforeend', '<div class="tittel">' + esc(e.kode || 'Ukjent nummer') + '</div>' +
+        '<div class="meta">' + esc(formatDato(e.dato)) + '</div>');
       card.appendChild(info);
       grid.appendChild(card);
     });
     area.innerHTML = '';
     area.appendChild(grid);
   }
+  $('statusFilter').addEventListener('change', function () { aktivStatus = this.value; renderBilder(); });
 
-  document.querySelectorAll('.tab').forEach(function (tab) {
-    tab.addEventListener('click', function () {
-      document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
-      tab.classList.add('active');
-      aktivKategori = tab.getAttribute('data-kat');
-      oppdaterTypeFilter();
-      renderGrid();
+  // ---------- Velg type og nummer selv ----------
+
+  function lagVelger(enhet, ferdig) {
+    var boks = document.createElement('div');
+    boks.className = 'velger';
+    var typeValg = '<option value="">Velg type …</option>' + typeRekkefolge.map(function (t) {
+      return '<option' + (t === enhet.type ? ' selected' : '') + '>' + esc(t) + '</option>';
+    }).join('');
+    boks.innerHTML =
+      '<div class="velger-rad"><select class="v-type">' + typeValg + '</select>' +
+      '<select class="v-kode" disabled><option value="">Velg nummer …</option></select>' +
+      '<button type="button" class="btn save v-send" disabled>Send til kontroll</button></div>' +
+      '<div class="form-error v-feil"></div>';
+    var selType = boks.querySelector('.v-type');
+    var selKode = boks.querySelector('.v-kode');
+    var send = boks.querySelector('.v-send');
+    function fyllKoder() {
+      var t = selType.value;
+      selKode.innerHTML = '<option value="">Velg nummer …</option>' + (flate[t] || []).map(function (k) {
+        var e = finnEnhet(t, k);
+        var tatt = e && e.status === 'godkjent';
+        return '<option value="' + esc(k) + '"' + (tatt ? ' disabled' : '') + (k === enhet.kode ? ' selected' : '') + '>' +
+          esc(k) + (tatt ? ' (allerede sett)' : '') + '</option>';
+      }).join('');
+      selKode.disabled = !t;
+      send.disabled = !selKode.value;
+    }
+    selType.addEventListener('change', fyllKoder);
+    selKode.addEventListener('change', function () { send.disabled = !selKode.value; });
+    send.addEventListener('click', function () {
+      send.disabled = true;
+      send.textContent = 'Sender …';
+      api('/photos/' + enhet.id, { method: 'PATCH', body: JSON.stringify({ type: selType.value, kode: selKode.value }) })
+        .then(function (d) { erstattEnhet(d.enhet); oppdaterAlt(); ferdig(d.enhet); })
+        .catch(function (err) {
+          var f = boks.querySelector('.v-feil');
+          f.textContent = err.message; f.style.display = 'block';
+          send.disabled = false; send.textContent = 'Send til kontroll';
+        });
     });
-  });
-  document.getElementById('typeFilter').addEventListener('change', function () { aktivType = this.value; renderGrid(); });
-  document.getElementById('statusFilter').addEventListener('change', function () { aktivStatus = this.value; renderGrid(); });
-
-  // ---------- Typer (undermeny / sjekkliste) ----------
-
-  function renderTyperOversikt() {
-    apenType = null;
-    var area = document.getElementById('typerArea');
-    area.innerHTML = '';
-
-    ['Lok', 'Motorvogn'].forEach(function (kategori) {
-      var grupper = {};
-      enheter.filter(function (e) { return e.kategori === kategori; }).forEach(function (e) {
-        var n = e.type || UTEN_TYPE;
-        (grupper[n] = grupper[n] || []).push(e);
-      });
-
-      var alleNavn = (kategori === 'Lok' ? lokTyper : motorvognTyper).slice();
-      Object.keys(grupper).forEach(function (n) { if (n !== UTEN_TYPE && alleNavn.indexOf(n) === -1) alleNavn.push(n); });
-      alleNavn.sort(function (a, b) { return a.localeCompare(b, 'no'); });
-      if (grupper[UTEN_TYPE]) alleNavn.push(UTEN_TYPE);
-
-      var seksjon = document.createElement('div');
-      seksjon.className = 'type-seksjon ' + (kategori === 'Lok' ? 'lok' : 'motorvogn');
-      seksjon.innerHTML = '<h2 class="type-seksjon-tittel">' + kategori + '</h2>';
-
-      var wrap = document.createElement('div');
-      wrap.className = 'type-chips';
-      alleNavn.forEach(function (n) {
-        var liste = grupper[n] || [];
-        var sett = liste.filter(erSett).length;
-        var venter = liste.filter(function (e) { return e.status === 'venter'; }).length;
-        var chip = document.createElement('button');
-        chip.type = 'button';
-        chip.className = 'type-chip' + (sett > 0 ? ' harsett' : '');
-        chip.innerHTML = '<span class="type-chip-navn">' + esc(n) + '</span><span class="type-chip-antall">' +
-          sett + ' sett' + (venter ? ' · ' + venter + ' venter' : '') + '</span>';
-        chip.addEventListener('click', function () { renderTypeDetalj(kategori, n); });
-        wrap.appendChild(chip);
-      });
-      seksjon.appendChild(wrap);
-      area.appendChild(seksjon);
-    });
+    if (enhet.type) fyllKoder();
+    return boks;
   }
 
-  function renderTypeDetalj(kategori, type) {
-    apenType = { kategori: kategori, type: type };
-    var area = document.getElementById('typerArea');
-    area.innerHTML = '';
+  // ---------- Opplasting ----------
 
-    var topp = document.createElement('div');
-    topp.className = 'type-detalj-topp';
-    var tilbake = document.createElement('button');
-    tilbake.type = 'button';
-    tilbake.className = 'btn';
-    tilbake.textContent = '← Alle typer';
-    tilbake.addEventListener('click', renderTyperOversikt);
-    topp.appendChild(tilbake);
-    var leggTil = document.createElement('button');
-    leggTil.type = 'button';
-    leggTil.className = 'primary';
-    leggTil.textContent = 'Legg til med detaljer';
-    leggTil.addEventListener('click', function () {
-      apneAdd({ kategori: kategori, type: type === UTEN_TYPE ? '' : type });
-    });
-    topp.appendChild(leggTil);
-    area.appendChild(topp);
-
-    var tittel = document.createElement('h2');
-    tittel.className = 'type-detalj-tittel';
-    tittel.textContent = kategori + ' · ' + type;
-    area.appendChild(tittel);
-
-    // Hurtigregistrering: kode + bilde → sendes til kontroll.
-    if (type !== UTEN_TYPE) {
-      var hurtig = document.createElement('form');
-      hurtig.className = 'hurtig-sett';
-      hurtig.innerHTML =
-        '<input type="text" placeholder="Kode, f.eks. 72-06" aria-label="Kode">' +
-        '<label class="btn fil-knapp">📷 <span>Velg bilde</span><input type="file" accept="image/*" hidden></label>' +
-        '<button type="submit" class="btn save">Send til kontroll</button>';
-      var feil = document.createElement('div');
-      feil.className = 'form-error';
-      var filFelt = hurtig.querySelector('input[type=file]');
-      filFelt.addEventListener('change', function () {
-        hurtig.querySelector('.fil-knapp span').textContent = filFelt.files[0] ? filFelt.files[0].name : 'Velg bilde';
-      });
-      hurtig.addEventListener('submit', function (ev) {
-        ev.preventDefault();
-        var kodeFelt = hurtig.querySelector('input[type=text]');
-        var kode = kodeFelt.value.trim();
-        if (!kode) { kodeFelt.focus(); return; }
-        var fil = filFelt.files[0];
-        if (!fil) {
-          feil.textContent = 'Velg et bilde – loket/vogna blir krysset av som sett når bildet er godkjent.';
-          feil.style.display = 'block';
-          return;
-        }
-        var knapp = hurtig.querySelector('button[type=submit]');
-        knapp.disabled = true;
-        knapp.textContent = 'Laster opp …';
-        feil.style.display = 'none';
-        api('/photos', {
-          method: 'POST',
-          body: JSON.stringify({ kategori: kategori, type: type, kode: kode, dato: new Date().toISOString().slice(0, 10) }),
-        })
-          .then(function (d) {
-            erstattEnhet(d.enhet);
-            return lastOppBilde(d.enhet.id, fil).then(erstattEnhet);
-          })
-          .then(function () {
-            oppdaterAlt();
-            var nytt = document.querySelector('.hurtig-sett input[type=text]');
-            if (nytt) nytt.focus();
-          })
-          .catch(function (err) {
-            oppdaterAlt();
-            var nyFeil = document.querySelector('.hurtig-feil');
-            if (nyFeil) { nyFeil.textContent = err.message; nyFeil.style.display = 'block'; }
-          });
-      });
-      feil.classList.add('hurtig-feil');
-      area.appendChild(hurtig);
-      area.appendChild(feil);
-    }
-
-    var liste = enheter
-      .filter(function (e) { return e.kategori === kategori && (e.type || UTEN_TYPE) === type; })
-      .sort(function (a, b) {
-        return (a.kode || a.tittel || '').localeCompare(b.kode || b.tittel || '', 'no', { numeric: true });
-      });
-
-    if (liste.length === 0) {
-      var tom = document.createElement('div');
-      tom.className = 'empty';
-      tom.innerHTML = '<h3>Ingen lagt inn ennå</h3><p>Skriv inn koden, velg bilde og send til kontroll.</p>';
-      area.appendChild(tom);
-      return;
-    }
-
-    var enhetsListe = document.createElement('div');
-    enhetsListe.className = 'enhets-liste';
-    liste.forEach(function (e) {
+  $('opplastingInput').addEventListener('change', function (ev) {
+    var filer = Array.prototype.slice.call(ev.target.files || []);
+    ev.target.value = '';
+    if (!filer.length) return;
+    $('resultatListe').innerHTML = '';
+    $('resultatOverlay').classList.add('show');
+    var kjede = Promise.resolve();
+    filer.forEach(function (fil) {
       var rad = document.createElement('div');
-      rad.className = 'enhets-rad';
-      rad.addEventListener('click', function () { visEnhet(e.id); });
-
-      var thumb = lagThumb(e);
-      thumb.classList.add('thumb-liten');
-      rad.appendChild(thumb);
-
-      var midt = document.createElement('div');
-      midt.className = 'enhets-midt';
-      midt.innerHTML = '<div class="enhets-kode">' + esc(e.kode || e.tittel) + '</div>';
-      var under = document.createElement('div');
-      under.className = 'enhets-under';
-      if (e.status === 'avvist' && e.avvistGrunn) under.textContent = 'Avvist: ' + e.avvistGrunn;
-      else under.textContent = [e.sted, formatDato(e.dato)].filter(Boolean).join(' · ');
-      midt.appendChild(under);
-      rad.appendChild(midt);
-      rad.appendChild(lagStatus(e));
-      enhetsListe.appendChild(rad);
+      rad.className = 'resultat-rad';
+      rad.innerHTML = '<img class="resultat-bilde" alt="" src="' + URL.createObjectURL(fil) + '">' +
+        '<div class="resultat-tekst"><div class="resultat-tittel">Venter …</div><div class="resultat-under"></div></div>';
+      $('resultatListe').appendChild(rad);
+      kjede = kjede.then(function () { return lastOpp(fil, rad); });
     });
-    area.appendChild(enhetsListe);
+    kjede.then(function () { oppdaterAlt(); if ($('adminTab').style.display !== 'none') oppdaterAdminTeller(); });
+  });
+
+  function lastOpp(fil, rad) {
+    var tittel = rad.querySelector('.resultat-tittel');
+    var under = rad.querySelector('.resultat-under');
+    tittel.textContent = 'Laster opp og leser nummeret …';
+    rad.classList.add('jobber');
+    return Promise.all([komprimerBilde(fil, 1600, 1800000), komprimerBilde(fil, 1024, 380000)])
+      .then(function (b) {
+        var fd = new FormData();
+        fd.append('bilde', b[0], 'bilde.jpg');
+        fd.append('liten', b[1], 'liten.jpg');
+        return fetch('/api/opplasting', { method: 'POST', credentials: 'same-origin', body: fd });
+      })
+      .then(function (res) {
+        return res.json().catch(function () { return {}; }).then(function (d) {
+          if (!res.ok) throw new Error(d.error || 'Opplastingen feilet.');
+          return d;
+        });
+      })
+      .then(function (d) {
+        rad.classList.remove('jobber');
+        if (d.enhet && d.resultat !== 'allerede') erstattEnhet(d.enhet);
+        if (d.resultat === 'godkjent') {
+          rad.classList.add('ok');
+          tittel.textContent = '✓ ' + d.enhet.type + ' · ' + d.enhet.kode;
+          under.textContent = 'AI leste «' + d.lest + '». Krysset av som sett!';
+        } else if (d.resultat === 'allerede') {
+          rad.classList.add('info');
+          tittel.textContent = d.enhet.type + ' · ' + d.enhet.kode;
+          under.textContent = 'Du har allerede denne som sett. Bildet ble ikke lagret.';
+        } else {
+          rad.classList.add('venter');
+          tittel.textContent = 'Fant ikke nummeret';
+          under.textContent = d.aiFeil ? 'AI-kontrollen var ikke tilgjengelig. Velg type og nummer selv:'
+            : (d.lest ? 'AI leste «' + d.lest + '», men det står ikke i listen. Velg selv:' : (d.enhet.aiNotat || 'Velg type og nummer selv:'));
+          rad.querySelector('.resultat-tekst').appendChild(lagVelger(d.enhet, function (ny) {
+            rad.classList.remove('venter'); rad.classList.add('info');
+            tittel.textContent = ny.type + ' · ' + ny.kode;
+            under.textContent = 'Sendt til manuell kontroll.';
+            var v = rad.querySelector('.velger'); if (v) v.remove();
+          }));
+        }
+      })
+      .catch(function (err) {
+        rad.classList.remove('jobber'); rad.classList.add('feil');
+        tittel.textContent = 'Feil';
+        under.textContent = err.message;
+      });
   }
 
-  // ---------- Visning av én enhet ----------
+  function lukkResultat() { $('resultatOverlay').classList.remove('show'); oppdaterAlt(); }
+  $('lukkResultat').addEventListener('click', lukkResultat);
+  $('ferdigResultat').addEventListener('click', lukkResultat);
+
+  // ---------- Vis ett bilde ----------
 
   function visEnhet(id) {
     var e = enheter.find(function (x) { return x.id === id; });
     if (!e) return;
     valgtId = id;
-    var img = document.getElementById('viewImg');
-    var plass = document.getElementById('viewPlaceholder');
-    if (e.bildeUrl) {
-      img.src = e.bildeUrl;
-      img.style.display = 'block';
-      plass.style.display = 'none';
-    } else {
-      img.removeAttribute('src');
-      img.style.display = 'none';
-      plass.style.display = 'flex';
+    $('viewImg').src = e.bildeUrl || '';
+    $('viewImg').style.display = e.bildeUrl ? 'block' : 'none';
+    $('viewBadge').textContent = e.type || 'Ukjent type';
+    var s = statusFor(e);
+    $('viewStatus').className = 'status ' + s.klasse;
+    $('viewStatus').textContent = s.tekst;
+    $('viewTitle').textContent = e.kode || 'Ukjent nummer';
+    $('viewMeta').textContent = formatDato(e.dato);
+    var info = $('viewInfo');
+    var tekst = '';
+    if (e.status === 'avvist') tekst = 'Avvist' + (e.avvistGrunn ? ': ' + e.avvistGrunn : '') + '. Du kan velge riktig nummer under, eller slette bildet.';
+    else if (e.status === 'venter') tekst = 'Venter på manuell kontroll.' + (e.aiNotat ? ' ' + e.aiNotat : '');
+    else if (e.status === 'ukjent') tekst = (e.aiNotat ? e.aiNotat + ' ' : '') + 'Velg type og nummer:';
+    else if (e.aiNotat) tekst = e.aiNotat;
+    info.textContent = tekst;
+    info.style.display = tekst ? 'block' : 'none';
+    var v = $('viewVelger');
+    v.innerHTML = '';
+    if (e.status === 'ukjent' || e.status === 'avvist') {
+      v.appendChild(lagVelger(e, function () { visEnhet(id); visMelding('Sendt til manuell kontroll.', 'venter'); }));
     }
-    var badge = document.getElementById('viewBadge');
-    badge.className = 'badge ' + (e.kategori === 'Lok' ? 'lok' : 'motorvogn');
-    badge.textContent = e.kategori + (e.type ? ' · ' + e.type : '');
-    var st = STATUS[e.status] || STATUS.uten_bilde;
-    var stEl = document.getElementById('viewStatus');
-    stEl.className = 'status ' + st.klasse;
-    stEl.textContent = st.tekst;
-    var avvist = document.getElementById('viewAvvist');
-    if (e.status === 'avvist') {
-      avvist.textContent = 'Bildet ble avvist' + (e.avvistGrunn ? ': ' + e.avvistGrunn : '') + '. Last opp et nytt bilde.';
-      avvist.style.display = 'block';
-    } else if (e.status === 'venter') {
-      avvist.textContent = 'Bildet er sendt og venter på kontroll. Når det er godkjent, er den krysset av som sett.';
-      avvist.style.display = 'block';
-    } else {
-      avvist.style.display = 'none';
-    }
-    document.getElementById('viewTitle').textContent = e.kode && e.tittel !== e.kode ? e.tittel : (e.kode || e.tittel);
-    document.getElementById('viewMeta').textContent = [e.kode, e.sted, formatDato(e.dato)].filter(Boolean).join(' · ');
-    document.getElementById('viewNote').textContent = e.notat || '';
-    document.getElementById('addPhotoBtn').textContent = e.bildeUrl ? 'Bytt bilde' : 'Last opp bilde';
-    document.getElementById('viewOverlay').classList.add('show');
+    $('viewOverlay').classList.add('show');
   }
 
-  function lukkVis() {
-    document.getElementById('viewOverlay').classList.remove('show');
-    valgtId = null;
-  }
+  function lukkVis() { $('viewOverlay').classList.remove('show'); valgtId = null; }
+  $('closeView').addEventListener('click', lukkVis);
+  $('viewOverlay').addEventListener('click', function (e) { if (e.target === this) lukkVis(); });
 
-  document.getElementById('closeView').addEventListener('click', lukkVis);
-  document.getElementById('viewOverlay').addEventListener('click', function (e) { if (e.target === this) lukkVis(); });
-
-  document.getElementById('deleteBtn').addEventListener('click', function () {
-    if (!valgtId || !confirm('Slette denne og bildet?')) return;
+  $('deleteBtn').addEventListener('click', function () {
+    if (!valgtId || !confirm('Slette dette bildet?')) return;
     var id = valgtId;
     api('/photos/' + id, { method: 'DELETE' })
-      .then(function () {
-        enheter = enheter.filter(function (e) { return e.id !== id; });
-        lukkVis();
-        oppdaterAlt();
-      })
+      .then(function () { enheter = enheter.filter(function (e) { return e.id !== id; }); lukkVis(); oppdaterAlt(); })
       .catch(function (err) { alert(err.message); });
   });
 
-  document.getElementById('addPhotoBtn').addEventListener('click', function () {
-    var e = enheter.find(function (x) { return x.id === valgtId; });
-    if (e && e.status === 'godkjent' &&
-        !confirm('Denne er allerede godkjent. Bytter du bilde, må det kontrolleres på nytt. Fortsette?')) return;
-    document.getElementById('viewFileInput').click();
-  });
+  // ---------- Godkjenning (admin) ----------
 
-  document.getElementById('viewFileInput').addEventListener('change', function (ev) {
-    var fil = ev.target.files[0];
-    if (!fil || !valgtId) return;
-    var id = valgtId;
-    var knapp = document.getElementById('addPhotoBtn');
-    knapp.disabled = true;
-    knapp.textContent = 'Laster opp …';
-    lastOppBilde(id, fil)
-      .then(function (ny) { erstattEnhet(ny); oppdaterAlt(); visEnhet(id); })
-      .catch(function (err) { alert(err.message); visEnhet(id); })
-      .finally(function () { knapp.disabled = false; ev.target.value = ''; });
-  });
-
-  // ---------- Legg til (skjema) ----------
-
-  function oppdaterDatalist() {
-    var dl = document.getElementById('typeSuggestions');
-    dl.innerHTML = '';
-    var kilde = valgtKategoriForm === 'Lok' ? lokTyper : (valgtKategoriForm === 'Motorvogn' ? motorvognTyper : []);
-    kilde.forEach(function (t) {
-      var o = document.createElement('option');
-      o.value = t;
-      dl.appendChild(o);
-    });
-  }
-
-  document.querySelectorAll('.cat-btn').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      document.querySelectorAll('.cat-btn').forEach(function (b) { b.classList.remove('sel'); });
-      btn.classList.add('sel');
-      valgtKategoriForm = btn.getAttribute('data-kat');
-      oppdaterDatalist();
-    });
-  });
-
-  document.getElementById('fileInput').addEventListener('change', function (e) {
-    valgtFil = e.target.files[0] || null;
-    var prev = document.getElementById('previewImg');
-    if (valgtFil) {
-      prev.src = URL.createObjectURL(valgtFil);
-      prev.style.display = 'block';
-    } else {
-      prev.style.display = 'none';
-    }
-  });
-
-  function apneAdd(prefill) {
-    if (prefill && prefill.kategori) {
-      valgtKategoriForm = prefill.kategori;
-      document.querySelectorAll('.cat-btn').forEach(function (b) {
-        b.classList.toggle('sel', b.getAttribute('data-kat') === prefill.kategori);
-      });
-      oppdaterDatalist();
-    }
-    if (prefill && typeof prefill.type === 'string') document.getElementById('typeInput').value = prefill.type;
-    document.getElementById('addOverlay').classList.add('show');
-    document.getElementById('kodeInput').focus();
-  }
-
-  function lukkAdd() {
-    document.getElementById('addOverlay').classList.remove('show');
-    document.getElementById('addForm').reset();
-    document.getElementById('previewImg').style.display = 'none';
-    document.querySelectorAll('.cat-btn').forEach(function (b) { b.classList.remove('sel'); });
-    valgtKategoriForm = null;
-    valgtFil = null;
-    document.getElementById('tittelError').style.display = 'none';
-    document.getElementById('saveError').style.display = 'none';
-    oppdaterDatalist();
-  }
-
-  document.getElementById('addBtn').addEventListener('click', function () { apneAdd(); });
-  document.getElementById('closeAdd').addEventListener('click', lukkAdd);
-  document.getElementById('cancelAdd').addEventListener('click', lukkAdd);
-  document.getElementById('addOverlay').addEventListener('click', function (e) { if (e.target === this) lukkAdd(); });
-
-  document.getElementById('addForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var tittel = document.getElementById('tittelInput').value.trim();
-    var kode = document.getElementById('kodeInput').value.trim();
-    if (!tittel && !kode) {
-      document.getElementById('tittelError').style.display = 'block';
-      return;
-    }
-    document.getElementById('tittelError').style.display = 'none';
-    var errBox = document.getElementById('saveError');
-    errBox.style.display = 'none';
-
-    var saveBtn = document.getElementById('saveBtn');
-    saveBtn.disabled = true;
-    saveBtn.textContent = valgtFil ? 'Laster opp …' : 'Lagrer …';
-    var fil = valgtFil;
-
-    api('/photos', {
-      method: 'POST',
-      body: JSON.stringify({
-        tittel: tittel,
-        kategori: valgtKategoriForm || 'Lok',
-        type: document.getElementById('typeInput').value.trim(),
-        kode: kode,
-        sted: document.getElementById('stedInput').value.trim(),
-        dato: document.getElementById('datoInput').value,
-        notat: document.getElementById('notatInput').value.trim(),
-      }),
-    })
-      .then(function (d) {
-        erstattEnhet(d.enhet);
-        if (fil) return lastOppBilde(d.enhet.id, fil).then(erstattEnhet);
-      })
-      .then(function () { lukkAdd(); oppdaterAlt(); })
-      .catch(function (err) {
-        oppdaterAlt();
-        errBox.textContent = err.message;
-        errBox.style.display = 'block';
-      })
-      .finally(function () {
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'Lagre';
-      });
-  });
-
-  // ---------- Godkjenning (kun admin) ----------
-
-  function oppdaterAdminTeller(antall) {
-    var sett = function (n) { document.getElementById('adminTeller').textContent = n ? '(' + n + ')' : ''; };
-    if (typeof antall === 'number') return sett(antall);
+  function oppdaterAdminTeller(n) {
+    function sett(x) { $('adminTeller').textContent = x ? '(' + x + ')' : ''; }
+    if (typeof n === 'number') return sett(n);
     api('/admin/venter').then(function (d) { sett(d.enheter.length); }).catch(function () {});
   }
 
   function lastInnAdmin() {
-    var area = document.getElementById('adminArea');
-    area.innerHTML = '<div class="empty"><p>Henter …</p></div>';
-    api('/admin/venter')
-      .then(function (d) { renderAdmin(d.enheter); })
-      .catch(function (err) { area.innerHTML = '<div class="empty"><h3>Feil</h3><p>' + esc(err.message) + '</p></div>'; });
+    $('adminArea').innerHTML = '<div class="empty"><p>Henter …</p></div>';
+    api('/admin/venter').then(function (d) { renderAdmin(d.enheter); })
+      .catch(function (err) { $('adminArea').innerHTML = '<div class="empty"><h3>Feil</h3><p>' + esc(err.message) + '</p></div>'; });
   }
 
   function renderAdmin(liste) {
     oppdaterAdminTeller(liste.length);
-    var area = document.getElementById('adminArea');
+    var area = $('adminArea');
     area.innerHTML = '';
-    if (liste.length === 0) {
-      area.innerHTML = '<div class="empty"><h3>Ingenting å kontrollere</h3><p>Alle innsendte bilder er vurdert.</p></div>';
+    if (!liste.length) {
+      area.innerHTML = '<div class="empty"><h3>Ingenting å kontrollere</h3><p>AI har tatt seg av resten.</p></div>';
       return;
     }
-    var intro = document.createElement('p');
-    intro.className = 'sub';
-    intro.textContent = 'Sjekk at bildet viser riktig type og kode. Godkjente blir krysset av som sett hos brukeren.';
-    area.appendChild(intro);
-
+    area.insertAdjacentHTML('beforeend', '<p class="sub">Disse klarte ikke AI å bekrefte. Sjekk at bildet viser riktig nummer.</p>');
     liste.forEach(function (e) {
       var kort = document.createElement('div');
       kort.className = 'kontroll-kort';
       kort.innerHTML =
         '<a class="kontroll-bilde" href="' + esc(e.bildeUrl) + '" target="_blank" rel="noopener"><img src="' + esc(e.bildeUrl) + '" alt=""></a>' +
         '<div class="kontroll-info">' +
-          '<span class="badge ' + (e.kategori === 'Lok' ? 'lok' : 'motorvogn') + '">' + esc(e.kategori + (e.type ? ' · ' + e.type : '')) + '</span>' +
-          '<div class="kontroll-kode">' + esc(e.kode || e.tittel) + '</div>' +
-          '<div class="kontroll-meta">Fra <b>' + esc(e.bruker) + '</b>' +
-            (e.sted ? ' · ' + esc(e.sted) : '') + (e.dato ? ' · ' + esc(formatDato(e.dato)) : '') + '</div>' +
-          (e.notat ? '<div class="kontroll-notat">' + esc(e.notat) + '</div>' : '') +
+          '<span class="badge motorvogn">' + esc(e.type || '') + '</span>' +
+          '<div class="kontroll-kode">' + esc(e.kode || 'Ukjent') + '</div>' +
+          '<div class="kontroll-meta">Fra <b>' + esc(e.bruker) + '</b>' + (e.dato ? ' · ' + esc(formatDato(e.dato)) : '') + '</div>' +
+          (e.aiNotat ? '<div class="kontroll-ai">🤖 ' + esc(e.aiNotat) + '</div>' : '') +
           '<input type="text" class="kontroll-grunn" placeholder="Grunn hvis du avviser (f.eks. feil nummer)">' +
           '<div class="form-error kontroll-feil"></div>' +
           '<div class="modal-actions">' +
@@ -1170,20 +987,13 @@ input[type="file"] {
           if (!godkjent && !grunn) {
             feil.textContent = 'Skriv en kort grunn så brukeren vet hva som er feil.';
             feil.style.display = 'block';
-            kort.querySelector('.kontroll-grunn').focus();
             return;
           }
           kort.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
           api('/admin/vurder', { method: 'POST', body: JSON.stringify({ id: e.id, godkjent: godkjent, grunn: grunn }) })
-            .then(function () {
-              liste = liste.filter(function (x) { return x.id !== e.id; });
-              renderAdmin(liste);
-              // Admin kan også ha sendt inn selv – oppdater egen samling.
-              lastInn();
-            })
+            .then(function () { renderAdmin(liste.filter(function (x) { return x.id !== e.id; })); lastInn(); })
             .catch(function (err) {
-              feil.textContent = err.message;
-              feil.style.display = 'block';
+              feil.textContent = err.message; feil.style.display = 'block';
               kort.querySelectorAll('button').forEach(function (b) { b.disabled = false; });
             });
         });
